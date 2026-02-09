@@ -1,0 +1,36 @@
+{
+  "id": "/prensa/",
+  "name": "COMUNICACIONES",
+  "short_name": "COMUNICACIONES",
+  "start_url": "/prensa/",
+  "scope": "/prensa/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#06402B",
+  "capture_links": "existing-client-navigate",
+  "launch_handler": { "client_mode": "navigate-existing" },
+
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://botheart911.github.io/prensa/manifest.webmanifest",
+      "id": "/prensa/"
+    }
+  ],
+
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/dqqeavica/image/upload/v1770637843/Comunicaciones_h3rajy.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://res.cloudinary.com/dqqeavica/image/upload/v1770637843/Comunicaciones_h3rajy.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
