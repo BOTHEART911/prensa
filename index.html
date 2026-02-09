@@ -1123,11 +1123,23 @@ document.getElementById('btn-logout').addEventListener('click', ()=>{
   showView('view-login');
 });
 
+  /* ================== FORMATO FECHA HUMANA ================== */
+  function formatoFechaHumana(date){
+  const dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const d=dias[date.getDay()];
+  const dia=('0'+date.getDate()).slice(-2);
+  const mes=meses[date.getMonth()];
+  const y=date.getFullYear();
+  return `${d}, ${dia} de ${mes} de ${y}`;
+}
+
 /* ================== INICIO ================== */
 function renderInicio(){
   document.getElementById('inicio-profesional').textContent =
-    'PROFESIONAL: ' + (currentUser?.nombre || '');
-  document.getElementById('inicio-fecha').textContent = formatoFechaHumana(new Date());
+    'Hi ' + (currentUser?.nombre || '');
+  document.getElementById('inicio-fecha').textContent =
+    formatoFechaHumana(new Date());
 }
 
 /* ================== COMUNICADOS ================== */
