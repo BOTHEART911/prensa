@@ -1124,65 +1124,11 @@ document.getElementById('btn-logout').addEventListener('click', ()=>{
 });
 
 /* ================== INICIO ================== */
-function driveThumbById(id){ return id ? ('https://drive.google.com/thumbnail?sz=w1000&id='+id) : ''; }
 function renderInicio(){
-  const imgEl   = document.getElementById('inicio-avatar-img');
-  const emojiEl = document.getElementById('inicio-avatar-emoji');
-  const hasImagen = !!currentUser?.imagenId;
-
-  imgEl.onload = () => { imgEl.style.display=''; emojiEl.style.display='none'; };
-  imgEl.onerror = () => { imgEl.style.display='none'; emojiEl.style.display=''; };
-
-  if(hasImagen){
-    imgEl.style.display='none';
-    emojiEl.style.display='none';
-    imgEl.src = driveThumbById(currentUser.imagenId);
-  }else{
-    imgEl.style.display='none';
-    emojiEl.style.display='';
-  }
-
-  document.getElementById('inicio-nombre').textContent = supervisorNombreCompleto;
-  const rolEl = document.getElementById('inicio-rol');
-  if(rolEl) rolEl.textContent = 'SUPERVISOR(A)';
-
-  const firmaEl = document.getElementById('inicio-firma');
-  const hasFirma = !!currentUser?.firmaId;
-  if(hasFirma){
-    firmaEl.src = driveThumbById(currentUser.firmaId);
-    firmaEl.style.display='';
-  }else{
-    firmaEl.style.display='none';
-  }
+  document.getElementById('inicio-profesional').textContent =
+    'PROFESIONAL: ' + (currentUser?.nombre || '');
+  document.getElementById('inicio-fecha').textContent = formatoFechaHumana(new Date());
 }
-
-/* ================== OVERLAY MENÚ ================== */
-const overlay = document.getElementById('overlay');
-
-document.getElementById('btn-open-menu').addEventListener('click', ()=>{
-  playSoundOnce(SOUNDS.menu);
-  overlay.classList.add('open');
-});
-document.getElementById('btn-ovl-back').addEventListener('click', ()=>{
-  playSoundOnce(SOUNDS.back);
-  overlay.classList.remove('open');
-});
-document.getElementById('ovlClose').addEventListener('click', ()=>{
-  playSoundOnce(SOUNDS.back);
-  overlay.classList.remove('open');
-});
-
-/* Sonido 'logout' al seleccionar cualquiera de las opciones del overlay. */
-['go-comunicados','go-calendario','go-directorio','go-soporte']
-  .forEach(id => {
-    const el = document.getElementById(id);
-    if(el){
-      el.addEventListener('click', ()=>{
-        playSoundOnce(SOUNDS.logout);
-        overlay.classList.remove('open');
-      });
-    }
-  });
 
 /* ================== COMUNICADOS ================== */
 document.getElementById('go-comunicados').addEventListener('click', ()=>{ overlay.classList.remove('open'); showView('view-comunicados'); });
