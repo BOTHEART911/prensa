@@ -695,6 +695,26 @@
 .brief-item .btn-row{
   margin-top:10px;
 }
+
+      /* ================== INICIO: botones responsivos ================== */
+.inicio-actions{
+  display:grid;
+  gap:12px;
+  grid-template-columns: 1fr; /* móvil: 1 columna (como ya te gusta) */
+}
+
+/* Pantalla grande: 2 filas, centrado, estilo “menú horizontal” */
+@media (min-width: 900px){
+  .inicio-actions{
+    grid-template-columns: repeat(4, minmax(180px, 1fr)); /* 4 por fila */
+    max-width: 860px;
+    margin: 12px auto 0;
+    align-items: stretch;
+  }
+  .inicio-actions button{
+    width: 100%;
+  }
+}
   </style>
 </head>
 <body>
@@ -754,16 +774,16 @@
     <h2 id="inicio-profesional" style="color:var(--primary); font-weight:900;"></h2>
     <p id="inicio-fecha" class="center" style="font-weight:700; font-size:.95rem;"></p>
 
-    <div class="btn-row spaced">
-      <div class="btn-row spaced">
-      <button id="go-brief-pendiente" class="btn-primary">SOLICITUDES PENDIENTES</button>
-      <button id="go-brief-proceso" class="btn-primary">SOLICITUDES EN PROCESO</button>
-      <button id="go-brief-realizada" class="btn-primary">SOLICITUDES REALIZADAS</button>
-      <button id="go-comunicados" class="btn-primary">COMUNICADOS</button>
-      <button id="go-calendario" class="btn-primary">CALENDARIO INSTITUCIONAL</button>
-      <button id="go-directorio" class="btn-primary">DIRECTORIO INSTITUCIONAL</button>
-      <button id="go-soporte" class="btn-primary">SOPORTE</button>
-    </div>
+  <div class="inicio-actions spaced" id="inicio-actions">
+  <button id="go-brief-pendiente" class="btn-primary">SOLICITUDES PENDIENTES</button>
+  <button id="go-brief-proceso" class="btn-primary">SOLICITUDES EN PROCESO</button>
+  <button id="go-brief-realizada" class="btn-primary">SOLICITUDES REALIZADAS</button>
+
+  <button id="go-comunicados" class="btn-primary">COMUNICADOS</button>
+  <button id="go-calendario" class="btn-primary">CALENDARIO INSTITUCIONAL</button>
+  <button id="go-directorio" class="btn-primary">DIRECTORIO INSTITUCIONAL</button>
+  <button id="go-soporte" class="btn-primary">SOPORTE</button>
+</div>
 
     <img class="banner-bottom" alt="Banner" src="https://res.cloudinary.com/dqqeavica/image/upload/v1766347982/banner_wbfbf7.gif" />
     <p class="center muted">Copyright © <b>GOBIERNO DIGITAL</b></p>
