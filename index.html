@@ -1410,7 +1410,7 @@ document.getElementById('btn-logout').addEventListener('click', ()=>{
 /* ================== INICIO ================== */
 function renderInicio(){
   document.getElementById('inicio-profesional').textContent =
-    'Hi ' + (currentUser?.nombre || '');
+    'Hi, ' + (currentUser?.nombre || '');
   document.getElementById('inicio-fecha').textContent =
     formatoFechaHumana(new Date());
 }
