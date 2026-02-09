@@ -632,6 +632,69 @@
   border-radius:6px;
   background:#fff;
 }
+
+      /* ================== BRIEF (SOLICITUDES) ================== */
+.brief-header{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-bottom:12px;
+  text-align:center;
+}
+.brief-title{
+  font-weight:900;
+  color:var(--primary);
+  margin:0;
+}
+.brief-counter{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:40px;
+  height:40px;
+  border-radius:999px;
+  border:2px solid var(--primary);
+  background:#fff;
+  font-weight:900;
+  margin:0 auto;
+}
+.brief-subtitle{
+  margin:0;
+  font-weight:800;
+  color:#333;
+}
+.brief-filter{
+  border-radius:999px;
+  padding:10px 12px;
+}
+.brief-list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.brief-item{
+  background: rgba(255,255,255,.9);
+  border:2px solid #ddd;
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 6px 14px rgba(0,0,0,.12);
+}
+.brief-ref-strong{
+  font-weight:900;
+  color:#06402B;
+  text-transform:uppercase;
+}
+.brief-ref-muted{
+  font-weight:800;
+  color:#111;
+}
+.brief-ref-date{
+  font-weight:800;
+  color:#333;
+}
+.brief-item .btn-row{
+  margin-top:10px;
+}
   </style>
 </head>
 <body>
@@ -692,6 +755,10 @@
     <p id="inicio-fecha" class="center" style="font-weight:700; font-size:.95rem;"></p>
 
     <div class="btn-row spaced">
+      <div class="btn-row spaced">
+      <button id="go-brief-pendiente" class="btn-primary">SOLICITUDES PENDIENTES</button>
+      <button id="go-brief-proceso" class="btn-primary">SOLICITUDES EN PROCESO</button>
+      <button id="go-brief-realizada" class="btn-primary">SOLICITUDES REALIZADAS</button>
       <button id="go-comunicados" class="btn-primary">COMUNICADOS</button>
       <button id="go-calendario" class="btn-primary">CALENDARIO INSTITUCIONAL</button>
       <button id="go-directorio" class="btn-primary">DIRECTORIO INSTITUCIONAL</button>
@@ -726,6 +793,24 @@
         </div>
       </div>
     </section>
+
+    <!-- VISTA SOLICITUDES (BRIEF) -->
+<section id="view-brief" class="view">
+  <div class="card narrow">
+    <div class="brief-header">
+      <h2 id="brief-title" class="brief-title">SOLICITUDES</h2>
+      <div id="brief-counter" class="brief-counter">0</div>
+      <div id="brief-subtitle" class="brief-subtitle">N° de Solicitudes</div>
+      <input id="brief-filter" class="brief-filter" type="text" placeholder="Filtrar por cualquier dato (hasta columna P)">
+    </div>
+
+    <div class="btn-row spaced">
+      <button id="brief-back" class="danger">REGRESAR</button>
+    </div>
+
+    <div id="brief-list" class="brief-list" style="margin-top:12px;"></div>
+  </div>
+</section>
 
     <!-- VISTA DIRECTORIO INSTITUCIONAL -->
     <section id="view-directorio" class="view">
@@ -782,6 +867,121 @@
     <div class="btn-row spaced" style="margin-top:14px;">
       <button id="dir-guardar" class="btn-primary">GUARDAR</button>
       <button id="dir-regresar" class="danger">REGRESAR</button>
+    </div>
+  </div>
+</section>
+
+    <!-- VISTA DETALLE SOLICITUD (BRIEF) -->
+<section id="view-brief-detail" class="view">
+  <div class="card narrow">
+    <h2 id="brief-detail-title" style="color:var(--primary)">REVISAR SOLICITUD</h2>
+
+    <div class="cal-form-grid">
+      <input id="brief" type="hidden">
+      <input id="fechaIngreso" type="hidden">
+
+      <label for="nombreEvents">Nombre del Evento</label>
+      <textarea id="nombreEvents" rows="2" placeholder="Título descriptivo"></textarea>
+
+      <label>Fecha del Evento</label>
+      <input id="fechaEvents" type="text" placeholder="dd/mm/aaaa">
+
+      <label for="horaIs">Hora de Inicio</label>
+      <input id="horaIs" type="time">
+
+      <label for="horaFs">Hora de Terminación</label>
+      <input id="horaFs" type="time">
+
+      <label for="secrets">Secretaría</label>
+      <select id="secrets">
+        <option value="" disabled selected>Selecciona secretaría</option>
+        <option value="DESPACHO MUNICIPAL">DESPACHO MUNICIPAL</option>
+        <option value="SECRETARÍA DE GOBIERNO Y SERVICIOS ADMINISTRATIVOS">SECRETARÍA DE GOBIERNO Y SERVICIOS ADMINISTRATIVOS</option>
+        <option value="SECRETARÍA DE HACIENDA">SECRETARÍA DE HACIENDA</option>
+        <option value="SECRETARÍA DE EDUCACIÓN, DESARROLLO ECONÓMICO Y SOCIAL">SECRETARÍA DE EDUCACIÓN, DESARROLLO ECONÓMICO Y SOCIAL</option>
+        <option value="SECRETARÍA DE PLANEACIÓN E INFRAESTRUCTURA">SECRETARÍA DE PLANEACIÓN E INFRAESTRUCTURA</option>
+        <option value="SECRETARÍA DE ASUNTOS AGROPECUARIOS">SECRETARÍA DE ASUNTOS AGROPECUARIOS</option>
+        <option value="SECRETARÍA DE SALUD">SECRETARÍA DE SALUD</option>
+      </select>
+
+      <label>Requerimientos</label>
+      <div id="requerimients" class="cal-checklist">
+        <label class="cal-check-item">
+          <input type="checkbox" value="Cubrimiento Fotográfico">
+          <span>Cubrimiento Fotográfico</span>
+        </label>
+        <label class="cal-check-item">
+          <input type="checkbox" value="Cubrimiento Video">
+          <span>Cubrimiento Video</span>
+        </label>
+        <label class="cal-check-item">
+          <input type="checkbox" value="Diseño Pieza Publicitaria">
+          <span>Diseño Pieza Publicitaria</span>
+        </label>
+        <label class="cal-check-item">
+          <input type="checkbox" value="Perifoneo">
+          <span>Perifoneo</span>
+        </label>
+        <label class="cal-check-item">
+          <input type="checkbox" value="Apoyo Publicitario">
+          <span>Apoyo Publicitario</span>
+        </label>
+        <label class="cal-check-item">
+          <input type="checkbox" value="Producción Multimedia">
+          <span>Producción Multimedia</span>
+        </label>
+        <label class="cal-check-item">
+          <input type="checkbox" value="Publicación Página Web">
+          <span>Publicación Página Web</span>
+        </label>
+      </div>
+
+      <label for="otrs">Otros</label>
+      <textarea id="otrs" rows="2" placeholder="Opcional"></textarea>
+
+      <label for="lugarEvents">Lugar del Evento</label>
+      <textarea id="lugarEvents" rows="2" placeholder="Opcional"></textarea>
+
+      <label for="detalls">Detalles del Evento o Requerimiento</label>
+      <textarea id="detalls" rows="6" placeholder="Opcional"></textarea>
+
+      <label>Fecha de Publicación</label>
+      <input id="fechaPubs" type="text" placeholder="dd/mm/aaaa">
+
+      <label for="nombs">Responsable</label>
+      <input id="nombs" type="text" placeholder="Responsable">
+
+      <label for="contacts">Contacto (automático)</label>
+      <div class="contacto-wrap">
+        <input id="contacts" type="text">
+        <button
+          type="button"
+          id="brief-wa-btn"
+          class="btn-icon contacto-wa-btn"
+          aria-label="Abrir WhatsApp con el contacto"
+          title="Abrir WhatsApp"
+        >
+          <img
+            src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp"
+            alt="WhatsApp"
+          >
+        </button>
+      </div>
+
+      <label for="cargos">Cargo del Responsable</label>
+      <textarea id="cargos" rows="2" placeholder="Opcional"></textarea>
+
+      <label for="estads">Estado</label>
+      <select id="estads">
+        <option value="PENDIENTE">PENDIENTE</option>
+        <option value="EN PROCESO">EN PROCESO</option>
+        <option value="REALIZADA">REALIZADA</option>
+      </select>
+    </div>
+
+    <div class="btn-row spaced" style="margin-top:14px;">
+      <button id="brief-save" class="btn-primary">GUARDAR</button>
+      <button id="brief-detail-back" class="danger">REGRESAR</button>
     </div>
   </div>
 </section>
@@ -2574,6 +2774,310 @@ function normalizeNumber57(raw){
     window.open('https://wa.me/' + tel,'_blank');
   });
 })();
+
+  /* ================== BRIEF (SOLICITUDES) ================== */
+
+const BRIEF_API_LIST = 'listBriefByEstado';
+const BRIEF_API_GET  = 'getBrief';
+const BRIEF_API_SAVE = 'guardarBrief';
+
+let BRIEF_CURRENT_ESTADO = '';
+let BRIEF_CACHE = [];
+let BRIEF_DETAIL_RETURN_ESTADO = '';
+
+function normalizeEstadoUpper(s){
+  return String(s||'').trim().toUpperCase();
+}
+
+function parseDMY(str){
+  const s = String(str||'').trim();
+  if(!s) return null;
+  const p = s.split('/');
+  if(p.length !== 3) return null;
+  const d = parseInt(p[0],10), m = parseInt(p[1],10), y = parseInt(p[2],10);
+  if(!d || !m || !y) return null;
+  const dt = new Date(y, m-1, d, 0,0,0);
+  if(isNaN(dt.getTime())) return null;
+  return dt;
+}
+
+function briefMatchesFilter(item, q){
+  if(!q) return true;
+  const s = q.toLowerCase();
+  // hasta P (brief..cargos). Excluimos Q en adelante.
+  const fields = [
+    item.brief, item.fechaIngreso, item.estads,
+    item.nombreEvents, item.fechaEvents, item.horaIs, item.horaFs,
+    item.detalls, item.requerimients, item.otrs, item.lugarEvents,
+    item.fechaPubs, item.nombs, item.contacts, item.secrets, item.cargos
+  ];
+  return fields.some(v => String(v||'').toLowerCase().includes(s));
+}
+
+function briefEstadoTitle(estado){
+  const st = normalizeEstadoUpper(estado);
+  if(st === 'PENDIENTE') return 'SOLICITUDES PENDIENTES';
+  if(st === 'EN PROCESO') return 'SOLICITUDES EN PROCESO';
+  if(st === 'REALIZADA') return 'SOLICITUDES REALIZADAS';
+  return 'SOLICITUDES';
+}
+function briefEstadoSubtitle(estado){
+  const st = normalizeEstadoUpper(estado);
+  if(st === 'PENDIENTE') return 'N° de Solicitudes Pendientes';
+  if(st === 'EN PROCESO') return 'N° de Solicitudes En Proceso';
+  if(st === 'REALIZADA') return 'N° de Solicitudes Realizadas';
+  return 'N° de Solicitudes';
+}
+
+async function briefOpenList(estado){
+  BRIEF_CURRENT_ESTADO = normalizeEstadoUpper(estado);
+  BRIEF_DETAIL_RETURN_ESTADO = BRIEF_CURRENT_ESTADO;
+
+  document.getElementById('brief-title').textContent = briefEstadoTitle(BRIEF_CURRENT_ESTADO);
+  document.getElementById('brief-subtitle').textContent = briefEstadoSubtitle(BRIEF_CURRENT_ESTADO);
+  document.getElementById('brief-filter').value = '';
+  document.getElementById('brief-counter').textContent = '0';
+  document.getElementById('brief-list').innerHTML = '<p class="muted center">Cargando…</p>';
+
+  showView('view-brief');
+
+  try{
+    const list = await apiGet(BRIEF_API_LIST, { estado: BRIEF_CURRENT_ESTADO });
+    BRIEF_CACHE = Array.isArray(list) ? list : [];
+    renderBriefList();
+  }catch(e){
+    BRIEF_CACHE = [];
+    document.getElementById('brief-list').innerHTML = '';
+    Swal.fire({icon:'error', title:'Error', text:String(e.message||e)});
+  }
+}
+
+function renderBriefList(){
+  const wrap = document.getElementById('brief-list');
+  const q = (document.getElementById('brief-filter')?.value || '').trim();
+  if(!wrap) return;
+
+  wrap.innerHTML = '';
+
+  const filtered = BRIEF_CACHE.filter(it => briefMatchesFilter(it, q));
+
+  document.getElementById('brief-counter').textContent = String(filtered.length);
+
+  if(!filtered.length){
+    const p = document.createElement('p');
+    p.className = 'muted center';
+    p.textContent = 'No hay solicitudes para este estado.';
+    wrap.appendChild(p);
+    return;
+  }
+
+  filtered.forEach(it=>{
+    const card = document.createElement('div');
+    card.className = 'brief-item';
+
+    const ref1 = document.createElement('div');
+    ref1.className = 'brief-ref-strong';
+    ref1.textContent = (it.nombs || '-');
+
+    const ref2 = document.createElement('div');
+    ref2.className = 'brief-ref-muted';
+    ref2.textContent = (it.cargos || '-') + ' - ' + (it.secrets || '-');
+
+    const ref3 = document.createElement('div');
+    ref3.className = 'brief-ref-date';
+    ref3.textContent = 'Fecha de entrega o publicación: ' + (it.fechaPubs || '-');
+
+    card.appendChild(ref1);
+    card.appendChild(ref2);
+    card.appendChild(ref3);
+
+    const btnRow = document.createElement('div');
+    btnRow.className = 'btn-row spaced';
+
+    const btn = document.createElement('button');
+    btn.className = 'btn-primary';
+    btn.textContent = 'REVISAR';
+    btn.addEventListener('click', ()=> briefOpenDetail(it.brief, BRIEF_CURRENT_ESTADO));
+
+    btnRow.appendChild(btn);
+    card.appendChild(btnRow);
+
+    wrap.appendChild(card);
+  });
+}
+
+document.getElementById('brief-filter')?.addEventListener('input', ()=> renderBriefList());
+document.getElementById('brief-back')?.addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.back);
+  showView('view-inicio');
+});
+
+document.getElementById('go-brief-pendiente')?.addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.login);
+  briefOpenList('PENDIENTE');
+});
+document.getElementById('go-brief-proceso')?.addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.login);
+  briefOpenList('EN PROCESO');
+});
+document.getElementById('go-brief-realizada')?.addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.login);
+  briefOpenList('REALIZADA');
+});
+
+/* ---------- Detalle ---------- */
+
+function briefResetDetail(){
+  document.getElementById('brief').value = '';
+  document.getElementById('fechaIngreso').value = '';
+  document.getElementById('nombreEvents').value = '';
+  document.getElementById('fechaEvents').value = '';
+  document.getElementById('horaIs').value = '';
+  document.getElementById('horaFs').value = '';
+  document.getElementById('detalls').value = '';
+  document.getElementById('otrs').value = '';
+  document.getElementById('lugarEvents').value = '';
+  document.getElementById('fechaPubs').value = '';
+  document.getElementById('nombs').value = '';
+  document.getElementById('contacts').value = '';
+  document.getElementById('secrets').value = '';
+  document.getElementById('cargos').value = '';
+  document.getElementById('estads').value = 'PENDIENTE';
+
+  const checks = document.querySelectorAll('#requerimients input[type="checkbox"]');
+  checks.forEach(ch => ch.checked = false);
+}
+
+function briefReqChecksFromText(text){
+  const src = String(text||'');
+  const checks = document.querySelectorAll('#requerimients input[type="checkbox"]');
+  checks.forEach(ch=>{
+    ch.checked = src.indexOf(ch.value) !== -1;
+  });
+}
+function briefReqTextFromChecks(){
+  const checks = document.querySelectorAll('#requerimients input[type="checkbox"]');
+  const arr = [];
+  checks.forEach(ch=>{ if(ch.checked) arr.push(ch.value); });
+  return arr.join(', ');
+}
+
+function briefFillDetail(d){
+  briefResetDetail();
+  document.getElementById('brief').value = d.brief || '';
+  document.getElementById('fechaIngreso').value = d.fechaIngreso || '';
+
+  document.getElementById('nombreEvents').value = d.nombreEvents || '';
+  document.getElementById('fechaEvents').value = d.fechaEvents || '';
+  document.getElementById('horaIs').value = d.horaIs || '';
+  document.getElementById('horaFs').value = d.horaFs || '';
+  document.getElementById('detalls').value = d.detalls || '';
+  document.getElementById('otrs').value = d.otrs || '';
+  document.getElementById('lugarEvents').value = d.lugarEvents || '';
+  document.getElementById('fechaPubs').value = d.fechaPubs || '';
+  document.getElementById('nombs').value = d.nombs || '';
+  document.getElementById('contacts').value = d.contacts || '';
+  document.getElementById('secrets').value = d.secrets || '';
+  document.getElementById('cargos').value = d.cargos || '';
+  document.getElementById('estads').value = normalizeEstadoUpper(d.estads) || 'PENDIENTE';
+
+  briefReqChecksFromText(d.requerimients || '');
+}
+
+async function briefOpenDetail(briefId, returnEstado){
+  BRIEF_DETAIL_RETURN_ESTADO = normalizeEstadoUpper(returnEstado || BRIEF_CURRENT_ESTADO || 'PENDIENTE');
+  document.getElementById('brief-detail-title').textContent = 'REVISAR SOLICITUD';
+  showView('view-brief-detail');
+
+  try{
+    const data = await apiGet(BRIEF_API_GET, { brief: briefId });
+    if(!data){
+      Swal.fire({icon:'info', title:'No encontrado', text:'La solicitud ya no existe.'});
+      showView('view-brief');
+      return;
+    }
+    briefFillDetail(data);
+  }catch(e){
+    Swal.fire({icon:'error', title:'Error', text:String(e.message||e)});
+    showView('view-brief');
+  }
+}
+
+document.getElementById('brief-detail-back')?.addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.back);
+  showView('view-inicio');
+});
+
+/* Botón WhatsApp en detalle (usa el campo contacts) */
+(function bindBriefWhatsapp(){
+  const btn = document.getElementById('brief-wa-btn');
+  const input = document.getElementById('contacts');
+  if(!btn || !input) return;
+
+  btn.addEventListener('click', ()=>{
+    const raw = input.value || '';
+    const digits = String(raw).replace(/\D/g,'');
+    if(!digits){
+      Swal.fire({icon:'info', title:'Sin teléfono', text:'No hay un número válido.'});
+      return;
+    }
+    let num = digits;
+    if(/^\d{10}$/.test(num)) num = '57' + num;
+    if(!(num.length === 12 && num.startsWith('57'))){
+      Swal.fire({icon:'info', title:'Número inválido', text:'Debe ser 10 dígitos (Colombia) o venir con 57.'});
+      return;
+    }
+    window.open('https://wa.me/' + num, '_blank');
+  });
+})();
+
+/* Guardar */
+document.getElementById('brief-save')?.addEventListener('click', async ()=>{
+  const brief = document.getElementById('brief').value.trim();
+  if(!brief){
+    Swal.fire({icon:'warning', title:'ID inválido'});
+    return;
+  }
+
+  const body = {
+    brief,
+    fechaIngreso: document.getElementById('fechaIngreso').value.trim(),
+
+    nombreEvents: document.getElementById('nombreEvents').value.trim(),
+    fechaEvents: document.getElementById('fechaEvents').value.trim(),
+    horaIs: document.getElementById('horaIs').value.trim(),
+    horaFs: document.getElementById('horaFs').value.trim(),
+    detalls: document.getElementById('detalls').value.trim(),
+    requerimients: briefReqTextFromChecks(),
+    otrs: document.getElementById('otrs').value.trim(),
+    lugarEvents: document.getElementById('lugarEvents').value.trim(),
+    fechaPubs: document.getElementById('fechaPubs').value.trim(),
+    nombs: document.getElementById('nombs').value.trim(),
+    contacts: document.getElementById('contacts').value.trim(),
+    secrets: document.getElementById('secrets').value,
+    cargos: document.getElementById('cargos').value.trim(),
+    estads: document.getElementById('estads').value
+  };
+
+  if(!body.estads){
+    Swal.fire({icon:'warning', title:'Estado requerido'});
+    return;
+  }
+
+  try{
+    const r = await apiPost(BRIEF_API_SAVE, body);
+    if(!r || !r.success){
+      Swal.fire({icon:'error', title:'Error', text:'No se pudo guardar.'});
+      return;
+    }
+
+    await briefOpenList(BRIEF_DETAIL_RETURN_ESTADO || body.estads);
+
+    Swal.fire({icon:'success', title:'Guardado', timer:1400, showConfirmButton:false});
+  }catch(e){
+    Swal.fire({icon:'error', title:'Error', text:String(e.message||e)});
+  }
+});
 
 /* ================== FIN ================== */
 </script>
