@@ -1131,7 +1131,10 @@ function renderInicio(){
 }
 
 /* ================== COMUNICADOS ================== */
-document.getElementById('go-comunicados').addEventListener('click', ()=>{ overlay.classList.remove('open'); showView('view-comunicados'); });
+document.getElementById('go-comunicados').addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.login);
+  showView('view-comunicados');
+});
 document.getElementById('comunicado-enviar').addEventListener('click', async ()=>{
   const txt=(document.getElementById('comunicado-text').value||'').trim();
   if(!txt){ Swal.fire({icon:'warning',title:'Texto requerido'}); return; }
@@ -1152,7 +1155,10 @@ document.getElementById('comunicado-volver').addEventListener('click', ()=>{
 });
 
 /* ================== SOPORTE ================== */
-document.getElementById('go-soporte').addEventListener('click', ()=>{ overlay.classList.remove('open'); showView('view-soporte'); });
+document.getElementById('go-soporte').addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.login);
+  showView('view-soporte');
+});
 document.getElementById('soporte-enviar').addEventListener('click', async ()=>{
   const txt=(document.getElementById('soporte-text').value||'').trim();
   if(!txt){ Swal.fire({icon:'warning',title:'Texto requerido'}); return; }
@@ -1365,7 +1371,6 @@ function renderDirectorio(items){
 
 document.getElementById('go-directorio')?.addEventListener('click', async ()=>{
   playSoundOnce(SOUNDS.login);
-  overlay.classList.remove('open');
 
   if(!currentUser){
     Swal.fire({icon:'warning', title:'Sesión inválida'});
@@ -1950,7 +1955,7 @@ function calSyncViewButtons(){
 }
 
 document.getElementById('go-calendario')?.addEventListener('click', async ()=>{
-  overlay.classList.remove('open');
+  playSoundOnce(SOUNDS.login);
   await calLoadEvents();
   CAL_CURRENT_VIEW = 'month';
   CAL_CURRENT_DATE = new Date();
