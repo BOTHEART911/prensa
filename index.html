@@ -607,6 +607,31 @@
       border-radius:6px;
       background:#fff;
     }
+
+      .input-with-icon{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.input-with-icon a.icon-btn{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  height:44px;
+  border-radius:10px;
+  border:2px solid var(--primary);
+  background:#fff;
+  box-shadow: 0 6px 12px rgba(0,0,0,.18);
+}
+.input-with-icon a.icon-btn img{
+  width:24px;
+  height:24px;
+  object-fit:contain;
+  border-radius:6px;
+  background:#fff;
+}
   </style>
 </head>
 <body>
@@ -708,10 +733,58 @@
         <h2 style="color:var(--primary)">DIRECTORIO INSTITUCIONAL</h2>
         <div id="dir-list" class="contact-list"></div>
         <div class="btn-row spaced">
+          <button id="dir-agregar" class="btn-primary">AGREGAR</button>
           <button id="dir-volver" class="danger">REGRESAR</button>
         </div>
       </div>
     </section>
+
+<!-- VISTA AGREGAR / EDITAR DIRECTORIO INSTITUCIONAL -->
+    <section id="view-directorio-form" class="view">
+  <div class="card narrow">
+    <h2 id="dir-form-title" style="color:var(--primary)">AGREGAR DIRECTORIO</h2>
+
+    <label for="lugarD">Lugar</label>
+    <textarea id="lugarD" rows="2" placeholder="Registra el lugar"></textarea>
+
+    <label for="direccionD">Dirección</label>
+    <textarea id="direccionD" rows="3" placeholder="Registra el lugar"></textarea>
+
+    <label for="mapsD">Ubicación</label>
+    <p class="muted" style="margin:2px 0 8px;">
+      Debe ser un enlace de Google Maps tipo: https://maps.app.goo.gl/...
+    </p>
+    <div class="input-with-icon">
+      <input id="mapsD" type="url" placeholder="https://maps.app.goo.gl/..." />
+      <a
+        id="mapsGuideLink"
+        class="icon-btn"
+        href="https://share.google/MOlIy5MR8r38YZ6sU"
+        target="_blank"
+        rel="noopener"
+        title="Guía para obtener el enlace"
+      >
+        <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1760108968/ubicacion_zicnod.png" alt="Guía Maps">
+      </a>
+    </div>
+
+    <label for="correoD">Correo</label>
+    <input id="correoD" type="email" placeholder="Registra el correo si aplica" />
+
+    <label for="whatsappD">WhatsApp</label>
+    <input id="whatsappD" type="tel" inputmode="numeric" placeholder="Registra el correo si aplica" />
+
+    <label for="lineaD">Línea Telefónica</label>
+    <input id="lineaD" type="tel" inputmode="numeric" placeholder="Registra Línea Telefónica si aplica" />
+
+    <input id="id_dir" type="hidden" />
+
+    <div class="btn-row spaced" style="margin-top:14px;">
+      <button id="dir-guardar" class="btn-primary">GUARDAR</button>
+      <button id="dir-regresar" class="danger">REGRESAR</button>
+    </div>
+  </div>
+</section>
 
     <!-- VISTA CALENDARIO INSTITUCIONAL -->
     <section id="view-calendario" class="view">
@@ -1151,11 +1224,10 @@ document.getElementById('comunicado-enviar').addEventListener('click', async ()=
   const txt=(document.getElementById('comunicado-text').value||'').trim();
   if(!txt){ Swal.fire({icon:'warning',title:'Texto requerido'}); return; }
   try{
-    await apiPost('guardarComunicadoSupervisor',{
-      supervisor: supervisorNombreCompleto,
-      comunicado: txt,
-      imagenId: currentUser?.imagenId || ''
-    });
+    await apiPost('guardarComunicadoPrensa',{
+  profesional: currentUser?.nombre || '',
+  noticia: txt
+});
     Swal.fire({icon:'success',title:'COMUNICADO CARGADO CON ÉXITO',timer:4000,showConfirmButton:false});
     document.getElementById('comunicado-text').value='';
     renderInicio(); showView('view-inicio');
@@ -1175,11 +1247,11 @@ document.getElementById('soporte-enviar').addEventListener('click', async ()=>{
   const txt=(document.getElementById('soporte-text').value||'').trim();
   if(!txt){ Swal.fire({icon:'warning',title:'Texto requerido'}); return; }
   try{
-    await apiPost('guardarSoporteSupervisor',{
-      supervisor: supervisorNombreCompleto,
-      soporte: txt,
-      celular: ''
-    });
+   await apiPost('guardarSoportePrensa',{
+  profesional: currentUser?.nombre || '',
+  soporte: txt,
+  celular: currentUser?.telefono || ''
+});
     Swal.fire({icon:'success',title:'SOLICITUD CARGADA CON ÉXITO',timer:4000,showConfirmButton:false});
     document.getElementById('soporte-text').value='';
     renderInicio(); showView('view-inicio');
@@ -1213,48 +1285,49 @@ function openTelFromNumber(raw){
   window.location.href = 'tel:' + digits;
 }
 function buildShareText(item){
-  const nombre   = item.nombre   || '';
-  const dir      = item.direccion|| '';
-  const maps     = item.maps     || '';
-  const correo   = item.correo   || '';
+  const lugar    = item.lugar || item.nombre || '';
+  const dir      = item.direccion || '';
+  const maps     = item.maps || '';
+  const correo   = item.correo || '';
   const wa       = item.whatsapp || '';
-  const tel      = item.telefono || '';
+  const tel      = item.linea || item.telefono || '';
 
   const waDigits = normalizePhoneDigits(wa);
   const waUrl    = waDigits ? ('wa.me/' + waDigits) : '';
 
   return (
     '*INFORMACIÓN DE CONTACTO:*\n\n' +
-    '*CONTACTO:* ' + (nombre || '-') + '\n' +
+    '*LUGAR:* ' + (lugar || '-') + '\n' +
     '*DIRECCIÓN:* ' + (dir || '-') + '\n' +
     '*UBICACIÓN:* ' + (maps || '-') + '\n' +
     '*CORREO:* ' + (correo || '-') + '\n' +
     '*WHATSAPP:* ' + (waUrl || '-') + '\n' +
-    '*TELEFONO:* ' + (tel || '-')
+    '*LÍNEA:* ' + (tel || '-')
   );
 }
+  
 function buildClipboardText(item){
-  const nombre   = item.nombre   || '';
-  const dir      = item.direccion|| '';
-  const correo   = item.correo   || '';
+  const lugar    = item.lugar || item.nombre || '';
+  const dir      = item.direccion || '';
+  const correo   = item.correo || '';
   const wa       = item.whatsapp || '';
-  const tel      = item.telefono || '';
+  const tel      = item.linea || item.telefono || '';
 
   return (
-    'CONTACTO: ' + (nombre || '-') + '\n' +
+    'LUGAR: ' + (lugar || '-') + '\n' +
     'DIRECCIÓN: ' + (dir || '-') + '\n' +
     'CORREO: ' + (correo || '-') + '\n' +
     'WHATSAPP: ' + (wa || '-') + '\n' +
-    'TELEFONO: ' + (tel || '-')
+    'LÍNEA: ' + (tel || '-')
   );
 }
-async function showDirectorioShareDialog(item){
-  const html =
-    '<b>CONTACTO:</b> ' + (item.nombre || '-') + '<br>' +
-    '<b>DIRECCIÓN:</b> ' + (item.direccion || '-') + '<br>' +
-    '<b>CORREO:</b> ' + (item.correo || '-') + '<br>' +
-    '<b>WHATSAPP:</b> ' + (item.whatsapp || '-') + '<br>' +
-    '<b>TELEFONO:</b> ' + (item.telefono || '-');
+  
+const html =
+  '<b>LUGAR:</b> ' + (item.lugar || item.nombre || '-') + '<br>' +
+  '<b>DIRECCIÓN:</b> ' + (item.direccion || '-') + '<br>' +
+  '<b>CORREO:</b> ' + (item.correo || '-') + '<br>' +
+  '<b>WHATSAPP:</b> ' + (item.whatsapp || '-') + '<br>' +
+  '<b>LÍNEA:</b> ' + (item.linea || '-');
 
   const result = await Swal.fire({
     icon:'success',
@@ -1311,7 +1384,7 @@ function renderDirectorio(items){
 
     const nameEl = document.createElement('div');
     nameEl.className = 'contact-name';
-    nameEl.textContent = it.nombre || '';
+    nameEl.textContent = it.lugar || it.nombre || '';
 
     const addrEl = document.createElement('div');
     addrEl.className = 'contact-address';
@@ -1323,6 +1396,19 @@ function renderDirectorio(items){
 
     const actions = document.createElement('div');
     actions.className = 'contact-actions-row';
+
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Editar';
+    editBtn.style.width = 'auto';
+    editBtn.style.height = 'auto';
+    editBtn.style.padding = '6px 10px';
+    editBtn.style.borderRadius = '999px';
+    editBtn.style.fontSize = '.75rem';
+    editBtn.style.fontWeight = '800';
+    editBtn.style.border = '2px solid var(--primary)';
+    editBtn.style.background = '#fff';
+    editBtn.addEventListener('click', ()=> openDirectorioForEdit(it.id_dir));
+    actions.appendChild(editBtn);
 
     if(it.maps){
       const a = document.createElement('a');
@@ -1357,10 +1443,10 @@ function renderDirectorio(items){
       actions.appendChild(a);
     }
 
-    if(it.telefono){
+    if(it.linea){
       const a = document.createElement('a');
       a.href = 'javascript:void(0)';
-      a.addEventListener('click', ()=> openTelFromNumber(it.telefono));
+      a.addEventListener('click', ()=> openTelFromNumber(it.linea));
       const img = document.createElement('img');
       img.src = ICON_DIR_TEL;
       img.alt = '';
@@ -1381,6 +1467,137 @@ function renderDirectorio(items){
   });
 }
 
+  function resetDirectorioForm(){
+  document.getElementById('id_dir').value = '';
+  document.getElementById('lugarD').value = '';
+  document.getElementById('direccionD').value = '';
+  document.getElementById('mapsD').value = '';
+  document.getElementById('correoD').value = '';
+  document.getElementById('whatsappD').value = '';
+  document.getElementById('lineaD').value = '';
+}
+
+function normalizeOptionalAsSpace(v){
+  const s = String(v || '').trim();
+  return s ? s : ' ';
+}
+
+function validateMapsUrlStrict(u){
+  return /^https:\/\/maps\.app\.goo\.gl\//i.test(String(u||'').trim());
+}
+
+function validateEmailOptional(v){
+  const s = String(v||'').trim();
+  if(!s) return true;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+}
+
+function validate10DigitsOptional(v){
+  const s = String(v||'').trim();
+  if(!s) return true;
+  return /^[0-9]{10}$/.test(s);
+}
+
+async function openDirectorioForNew(){
+  document.getElementById('dir-form-title').textContent = 'AGREGAR DIRECTORIO';
+  resetDirectorioForm();
+  showView('view-directorio-form');
+}
+
+async function openDirectorioForEdit(id_dir){
+  if(!id_dir){
+    Swal.fire({icon:'warning', title:'ID inválido'});
+    return;
+  }
+  try{
+    const r = await apiGet('getDirectorio', { id_dir });
+    if(!r){
+      Swal.fire({icon:'info', title:'Registro no encontrado'});
+      return;
+    }
+    document.getElementById('dir-form-title').textContent = 'EDITAR DIRECTORIO';
+    document.getElementById('id_dir').value = r.id_dir || '';
+    document.getElementById('lugarD').value = r.lugar || '';
+    document.getElementById('direccionD').value = r.direccion || '';
+    document.getElementById('mapsD').value = r.maps || '';
+    document.getElementById('correoD').value = (r.correo && r.correo !== ' ') ? r.correo : '';
+    document.getElementById('whatsappD').value = (r.whatsapp && r.whatsapp !== ' ') ? r.whatsapp : '';
+    document.getElementById('lineaD').value = (r.linea && r.linea !== ' ') ? r.linea : '';
+    showView('view-directorio-form');
+  }catch(e){
+    Swal.fire({icon:'error', title:'Error', text:String(e.message||e)});
+  }
+}
+
+document.getElementById('dir-agregar')?.addEventListener('click', ()=> openDirectorioForNew());
+document.getElementById('dir-regresar')?.addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.back);
+  showView('view-directorio');
+});
+
+document.getElementById('dir-guardar')?.addEventListener('click', async ()=>{
+  const id_dir = String(document.getElementById('id_dir').value || '').trim();
+  const lugarD = String(document.getElementById('lugarD').value || '').trim();
+  const direccionD = String(document.getElementById('direccionD').value || '').trim();
+  const mapsD = String(document.getElementById('mapsD').value || '').trim();
+  const correoD = String(document.getElementById('correoD').value || '').trim();
+  const whatsappD = String(document.getElementById('whatsappD').value || '').trim();
+  const lineaD = String(document.getElementById('lineaD').value || '').trim();
+
+  if(!lugarD){
+    Swal.fire({icon:'warning', title:'Lugar requerido'});
+    return;
+  }
+  if(!direccionD){
+    Swal.fire({icon:'warning', title:'Dirección requerida'});
+    return;
+  }
+  if(!mapsD){
+    Swal.fire({icon:'warning', title:'Ubicación requerida'});
+    return;
+  }
+  if(!validateMapsUrlStrict(mapsD)){
+    Swal.fire({icon:'warning', title:'Ubicación inválida', text:'Debe iniciar con https://maps.app.goo.gl/'});
+    return;
+  }
+  if(!validateEmailOptional(correoD)){
+    Swal.fire({icon:'warning', title:'Correo inválido'});
+    return;
+  }
+  if(!validate10DigitsOptional(whatsappD)){
+    Swal.fire({icon:'warning', title:'WhatsApp inválido', text:'Debe tener 10 dígitos.'});
+    return;
+  }
+  if(!validate10DigitsOptional(lineaD)){
+    Swal.fire({icon:'warning', title:'Línea inválida', text:'Debe tener 10 dígitos.'});
+    return;
+  }
+
+  const body = {
+    id_dir,
+    lugarD,
+    direccionD,
+    mapsD,
+    correoD: normalizeOptionalAsSpace(correoD),
+    whatsappD: normalizeOptionalAsSpace(whatsappD),
+    lineaD: normalizeOptionalAsSpace(lineaD)
+  };
+
+  try{
+    const r = await apiPost('guardarDirectorio', body);
+    if(!r || !r.success){
+      Swal.fire({icon:'error', title:'Error al guardar', text:(r && r.message) ? r.message : 'Intenta nuevamente.'});
+      return;
+    }
+    const list = await apiGet('listDirectorio', {});
+    renderDirectorio(Array.isArray(list) ? list : []);
+    Swal.fire({icon:'success', title:'Guardado', timer:1200, showConfirmButton:false});
+    showView('view-directorio');
+  }catch(e){
+    Swal.fire({icon:'error', title:'Error', text:String(e.message||e)});
+  }
+});
+  
 document.getElementById('go-directorio')?.addEventListener('click', async ()=>{
   playSoundOnce(SOUNDS.login);
 
