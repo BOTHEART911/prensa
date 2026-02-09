@@ -633,67 +633,41 @@
   background:#fff;
 }
 
-      /* ================== BRIEF (SOLICITUDES) ================== */
-.brief-header{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  margin-bottom:12px;
-  text-align:center;
-}
-.brief-title{
-  font-weight:900;
-  color:var(--primary);
-  margin:0;
-}
-.brief-counter{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:40px;
-  height:40px;
-  border-radius:999px;
-  border:2px solid var(--primary);
-  background:#fff;
-  font-weight:900;
-  margin:0 auto;
-}
-.brief-subtitle{
-  margin:0;
-  font-weight:800;
-  color:#333;
-}
-.brief-filter{
-  border-radius:999px;
-  padding:10px 12px;
-}
+    /* ================== BRIEF (SOLICITUDES) ================== */
 .brief-list{
   display:flex;
   flex-direction:column;
   gap:12px;
 }
+
+/* Tarjeta con look “opaco” como formularios (no blanca sólida) */
 .brief-item{
-  background: rgba(255,255,255,.9);
-  border:2px solid #ddd;
-  border-radius:16px;
-  padding:12px;
-  box-shadow:0 6px 14px rgba(0,0,0,.12);
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(3px);
+  border: 2px solid #ddd;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.18);
+  padding: 12px;
 }
+
+/* ÚNICO en negrilla (Columna M) */
 .brief-ref-strong{
   font-weight:900;
   color:#06402B;
   text-transform:uppercase;
+  margin-bottom:4px;
 }
+
+/* Lo demás NO va en negrilla */
 .brief-ref-muted{
-  font-weight:800;
+  font-weight:600;
   color:#111;
+  margin:2px 0;
 }
 .brief-ref-date{
-  font-weight:800;
-  color:#333;
-}
-.brief-item .btn-row{
-  margin-top:10px;
+  font-weight:600;
+  color:#111;
+  margin:2px 0 0;
 }
 
       /* ================== INICIO: botones responsivos ================== */
@@ -999,10 +973,14 @@
       </select>
     </div>
 
-    <div class="btn-row spaced" style="margin-top:14px;">
-      <button id="brief-save" class="btn-primary">GUARDAR</button>
-      <button id="brief-detail-back" class="danger">REGRESAR</button>
-    </div>
+   <div class="btn-row spaced" style="margin-top:14px;">
+  <button id="brief-share-group" class="btn-primary">DETALLES A GRUPO</button>
+</div>
+
+<div class="btn-row spaced" style="margin-top:10px;">
+  <button id="brief-save" class="btn-primary">GUARDAR</button>
+  <button id="brief-detail-back" class="danger">REGRESAR</button>
+</div>
   </div>
 </section>
 
@@ -2864,6 +2842,18 @@ async function briefOpenList(estado){
   try{
     const list = await apiGet(BRIEF_API_LIST, { estado: BRIEF_CURRENT_ESTADO });
     BRIEF_CACHE = Array.isArray(list) ? list : [];
+
+    if(!BRIEF_CACHE.length){
+      const titulo = briefEstadoTitle(BRIEF_CURRENT_ESTADO);
+      await Swal.fire({
+        icon:'success',
+        title: 'No hay ' + titulo,
+        text: 'Se irán mostrando una vez se realicen'
+      });
+      showView('view-inicio');
+      return;
+    }
+
     renderBriefList();
   }catch(e){
     BRIEF_CACHE = [];
@@ -2981,6 +2971,78 @@ function briefReqTextFromChecks(){
   checks.forEach(ch=>{ if(ch.checked) arr.push(ch.value); });
   return arr.join(', ');
 }
+
+  function toAmPmFromHHmm(hhmm){
+  const s = String(hhmm || '').trim();
+  if(!/^\d{2}:\d{2}$/.test(s)) return s;
+  const parts = s.split(':');
+  let h = parseInt(parts[0],10);
+  const m = parts[1];
+  if(isNaN(h)) return s;
+
+  const suf = h >= 12 ? 'PM' : 'AM';
+  let h12 = h % 12;
+  if(h12 === 0) h12 = 12;
+
+  return h12 + ':' + m + ' ' + suf;
+}
+
+function normalizeDigits(raw){
+  return String(raw || '').replace(/\D/g,'');
+}
+
+function waLinkFromContact(raw){
+  const digits = normalizeDigits(raw);
+  if(!digits) return '';
+  if(/^\d{10}$/.test(digits)) return 'wa.me/57' + digits;
+  if(digits.startsWith('57') && digits.length === 12) return 'wa.me/' + digits;
+  return 'wa.me/' + digits;
+}
+
+function buildBriefGroupMessage(){
+  const nombreEvento = document.getElementById('nombreEvents').value.trim();
+  const fechaEvento  = document.getElementById('fechaEvents').value.trim();
+  const horaInicio   = toAmPmFromHHmm(document.getElementById('horaIs').value.trim());
+  const horaFin      = toAmPmFromHHmm(document.getElementById('horaFs').value.trim());
+  const detalles     = document.getElementById('detalls').value.trim();
+  const reqText      = briefReqTextFromChecks();
+  const otros        = document.getElementById('otrs').value.trim();
+  const lugar        = document.getElementById('lugarEvents').value.trim();
+  const fechaPub     = document.getElementById('fechaPubs').value.trim();
+  const responsable  = document.getElementById('nombs').value.trim();
+  const contactoRaw  = document.getElementById('contacts').value.trim();
+  const secretaria   = document.getElementById('secrets').value;
+  const cargo        = document.getElementById('cargos').value.trim();
+
+  const waLink = waLinkFromContact(contactoRaw);
+
+  return (
+    '*Hola equipo, envío datos de solicitud*\n' +
+    '*Nombre del Evento.* ' + (nombreEvento || '-') + '\n' +
+    '*Fecha* ' + (fechaEvento || '-') + '\n' +
+    '*Hora de Inicio:* ' + (horaInicio || '-') + '\n' +
+    '*Hora de Terminación:* ' + (horaFin || '-') + '\n' +
+    '*Detalles:*\n' + (detalles || '-') + '\n' +
+    '*Requerimientos:*\n' + (reqText || '-') + '\n' +
+    '*Otros:* ' + (otros || '-') + '\n' +
+    '*Lugar del Evento:* ' + (lugar || '-') + '\n' +
+    '*Fecha de Publicación:* ' + (fechaPub || '-') + '\n' +
+    '*Responsable:* ' + (responsable || '-') + '\n' +
+    '*Contacto:* ' + (waLink || '-') + '\n' +
+    '*Secretaría:* ' + (secretaria || '-') + '\n' +
+    '*Cargo:* ' + (cargo || '-')
+  );
+}
+
+document.getElementById('brief-share-group')?.addEventListener('click', async ()=>{
+  const msg = buildBriefGroupMessage();
+
+  const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent || '');
+  const enc = encodeURIComponent(msg);
+  const url = esMovil ? 'whatsapp://send?text=' + enc : 'https://api.whatsapp.com/send?text=' + enc;
+
+  window.open(url, '_blank');
+});
 
 function briefFillDetail(d){
   briefResetDetail();
