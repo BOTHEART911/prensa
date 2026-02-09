@@ -1,0 +1,2426 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>COMUNICACIONES</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="https://res.cloudinary.com/dqqeavica/image/upload/v1770637843/Comunicaciones_h3rajy.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+  :root{
+    --primary:#06402B;    /* verde institucional */
+    --primary-2:#04281C;
+    --ok:#16a34a;
+    --error:#dc2626;
+    --scrim:rgba(0,0,0,.35);
+  }
+  html,body{
+    margin:0; padding:0; height:100%; width:100%;
+    overflow-x:hidden;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color:#111;
+    background: url('https://res.cloudinary.com/dqqeavica/image/upload/v1746905874/fondo_naranja_umjcru.png') center/cover fixed no-repeat;
+  }
+  .container{ max-width: 1100px; margin: 0 auto; padding: 16px; }
+
+  .view{ display:none; opacity:0; transform: translateY(8px);
+    transition: opacity .25s ease, transform .25s ease;
+    box-sizing:border-box; padding:16px;
+  }
+  .view.active{ display:block; opacity:1; transform: translateY(0); }
+
+  .card{
+    background: rgba(255,255,255,.06);
+    backdrop-filter: blur(3px);
+    border: 2px solid #ddd;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.18);
+    max-width: 820px;
+    margin: 16px auto;
+    padding: 20px 20px 16px;
+  }
+  h1,h2,h3{ margin: 8px 0 12px; text-align:center; }
+  p.helper{ color:#444; font-size:.95rem; text-align:center; margin:8px 0 16px; }
+  label{ display:block; font-weight:700; margin: 10px 0 6px; color:var(--primary); }
+  input, select, textarea, button{
+    width:100%; padding:12px; box-sizing:border-box;
+    border:1.5px solid #ccc; border-radius:8px; background:#fff;
+    outline:none; transition: border-color .2s ease, transform .08s ease;
+    font-size:16px;
+  }
+  input:focus, select:focus, textarea:focus{ border-color:var(--primary); }
+  button{
+    cursor:pointer; border:2px solid var(--primary);
+    background:#fff; color:#000; font-weight:700;
+  }
+  button:hover{ background:var(--primary-2); color:#fff; border-color:var(--primary-2); }
+  .btn-primary{ background:var(--primary); color:#fff; }
+  .btn-row{ display:flex; gap:12px; flex-wrap:wrap; }
+  .btn-row > *{ flex:1; }
+  .muted{ color:#666; font-size:.85rem; }
+  .center{ text-align:center; }
+  .image-center{ display:flex; justify-content:center; }
+  .brand{ width:240px; border-radius:12px; display:block; margin:12px auto 4px; }
+  .banner-bottom{ width:240px; border-radius:12px; display:block; margin:16px auto 8px; }
+  .chip{
+    padding:8px 12px; border-radius:999px; border:2px solid var(--primary);
+    background:#fff; font-weight:700; color:#000; text-decoration:none;
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .danger{ background:#e11; border-color:#e11; color:#fff; }
+
+ /* Botones de icono: sin recuadro ni fondo, con enfoque accesible */
+.btn-icon{
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 10px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-icon:hover,
+.btn-icon:active{
+  background: transparent !important;
+  color: inherit !important;
+  border: 0 !important;
+}
+.btn-icon:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(4,40,28,.28);
+  border-radius: 10px;
+}
+.btn-icon img{
+  width: 80px;
+  height: 80px;
+  display: block;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+  /* Loader centrado */
+  .loader{
+    position:fixed; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,.35);
+    z-index:9999; backdrop-filter: blur(2px);
+    opacity:1; transition: opacity .12s ease;
+  }
+  .loader.hidden{
+    opacity:0; pointer-events:none;
+  }
+  .spinner-ios{
+    position:relative; width:64px; height:64px;
+  }
+  .spinner-ios i{
+    position:absolute; left:50%; top:50%;
+    width:6px; height:18px; margin:-9px 0 0 -3px;
+    background:#fff; border-radius:3px;
+    opacity:.2;
+    animation:iosFade 1.2s linear infinite;
+    transform-origin: center center;
+  }
+  @keyframes iosFade{
+    0%, 39%, 100% { opacity:.2; }
+    40% { opacity:1; }
+  }
+  .spinner-ios i:nth-child(1)  { transform: rotate(  0deg) translateY(-24px); animation-delay:-1.1s; }
+  .spinner-ios i:nth-child(2)  { transform: rotate( 30deg) translateY(-24px); animation-delay:-1.0s; }
+  .spinner-ios i:nth-child(3)  { transform: rotate( 60deg) translateY(-24px); animation-delay:-0.9s; }
+  .spinner-ios i:nth-child(4)  { transform: rotate( 90deg) translateY(-24px); animation-delay:-0.8s; }
+  .spinner-ios i:nth-child(5)  { transform: rotate(120deg) translateY(-24px); animation-delay:-0.7s; }
+  .spinner-ios i:nth-child(6)  { transform: rotate(150deg) translateY(-24px); animation-delay:-0.6s; }
+  .spinner-ios i:nth-child(7)  { transform: rotate(180deg) translateY(-24px); animation-delay:-0.5s; }
+  .spinner-ios i:nth-child(8)  { transform: rotate(210deg) translateY(-24px); animation-delay:-0.4s; }
+  .spinner-ios i:nth-child(9)  { transform: rotate(240deg) translateY(-24px); animation-delay:-0.3s; }
+  .spinner-ios i:nth-child(10) { transform: rotate(270deg) translateY(-24px); animation-delay:-0.2s; }
+  .spinner-ios i:nth-child(11) { transform: rotate(300deg) translateY(-24px); animation-delay:-0.1s; }
+  .spinner-ios i:nth-child(12) { transform: rotate(330deg) translateY(-24px); animation-delay: 0s; }
+
+  .hidden{ display:none !important; }
+  .narrow{ max-width: 560px; margin: 0 auto; }
+  .spaced{ margin-top:12px; }
+
+  /* Overlay Menú lateral */
+  .overlay{ position: fixed; inset: 0; pointer-events:none; }
+  .overlay .scrim{ position:absolute; inset:0; background:var(--scrim); opacity:0; transition:opacity .25s ease; }
+  .overlay .panel{
+    position:absolute; top:0; left:0; width:min(360px, 90vw); height:100%;
+    background:#06402B; color:#fff; padding:16px 16px 8px 16px; box-sizing:border-box;
+    transform: translateX(-100%); transition: transform .25s ease;
+    display:flex; flex-direction:column; gap:10px; overflow-y:auto; min-height: 0;
+  }
+  .overlay.open{ pointer-events:auto; }
+  .overlay.open .scrim{ opacity:1; }
+  .overlay.open .panel{ transform: translateX(0); }
+  .panel h3{ margin: 4px 0 8px; text-align:center; }
+  .menu-btn{
+    background:#7de3ef; color:#000; border:0; font-weight:800;
+    border-radius:999px; padding:12px; box-shadow: 0 6px 12px rgba(0,0,0,.18);
+  }
+
+/* Avatar inicio: ajusta tamaño aquí */
+.avatar-emoji{
+  width:120px;
+  height:120px;
+  display:block;
+  margin:0 auto;
+}
+.avatar-img{
+  width:160px;
+  height:160px;
+  border-radius:999px;
+  border:2px solid #fff;
+  object-fit:cover;
+  display:block;
+  margin:0 auto;
+}
+
+  /* Firma preview */
+  .firma-preview{ max-width:260px; border-radius:12px; border:1.5px solid #d8e4ff; margin:8px auto 0; display:block; }
+
+  @media (max-width: 700px){
+    .btn-row{ flex-direction:column; }
+  }
+
+  /* Login: mostrar/ocultar cédula */
+  .pwd-wrapper{ position:relative; width:100%; }
+  .pwd-wrapper input#login-cedula{ display:block; width:100%; padding-right:40px; }
+  .toggle-cedula{
+    position:absolute; top:50%; right:10px; transform:translateY(-50%);
+    background:transparent !important; border:0 !important; padding:0; width:28px; height:28px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:6px;
+  }
+  .toggle-cedula img{ width:22px; height:22px; display:block; }
+
+    /* ================== CALENDARIO INSTITUCIONAL ================== */
+  .cal-wrapper{
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .cal-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+  }
+  .cal-title{
+    font-weight:800;
+    font-size:1.1rem;
+    color:var(--primary);
+  }
+  .cal-nav-group{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .cal-pill-btn{
+    border-radius:999px;
+    padding:8px 14px;
+    border:2px solid var(--primary);
+    background:#fff;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .cal-pill-btn.active{
+    background:var(--primary);
+    color:#fff;
+    border-color:var(--primary-2);
+  }
+  .cal-filter-wrap{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .cal-filter-input{
+    border-radius:999px;
+    padding:8px 12px;
+    border:1.5px solid #ccc;
+    min-width:220px;
+  }
+
+  .cal-grid{
+    margin-top:10px;
+    border-radius:16px;
+    background:rgba(255,255,255,.8);
+    border:2px solid #ddd;
+    overflow:hidden;
+  }
+  .cal-month-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    border-top:1px solid #eee;
+  }
+  .cal-weekdays{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    background:#f7fafc;
+    border-bottom:1px solid #eee;
+  }
+  .cal-weekday,
+  .cal-day-header{
+    padding:6px 4px;
+    text-align:center;
+    font-size:.8rem;
+    font-weight:700;
+    color:#555;
+  }
+  .cal-day-cell{
+    min-height:86px;
+    border-right:1px solid #f1f1f1;
+    border-bottom:1px solid #f1f1f1;
+    padding:4px;
+    box-sizing:border-box;
+    position:relative;
+    background:#fff;
+  }
+  .cal-day-cell.other-month{
+    background:#f9fafb;
+  }
+  .cal-day-number{
+    font-size:.78rem;
+    font-weight:700;
+    color:#111;
+  }
+  .cal-day-number.today{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:22px;
+    border-radius:999px;
+    background:var(--primary);
+    color:#fff;
+  }
+
+ .cal-event-chip{
+    margin-top:2px;
+    padding:1px 2px;
+    border-radius:8px;
+    font-size:clamp(.32rem, 0.7vw, .58rem);
+    line-height:1.1;
+    cursor:pointer;
+    color:#111;
+    box-shadow:0 1px 3px rgba(0,0,0,.16);
+    background:#f9fafb;
+    border:1px solid #d4d4d8;
+  }
+  .cal-event-chip .cal-evt-title{
+    font-weight:800;
+    display:block;
+    font-size:clamp(.34rem, 0.8vw, .66rem);
+  }
+  .cal-event-chip .cal-evt-time{
+    font-weight:600;
+    font-size:clamp(.30rem, 0.65vw, .56rem);
+  }
+
+  /* SECRETARÍAS: PROGRAMADO (solo borde) */
+  .sec-despacho{ border-color:#f87171; background:#f9fafb; }
+  .sec-gobierno{ border-color:#60a5fa; background:#f9fafb; }
+  .sec-hacienda{ border-color:#facc15; background:#f9fafb; }
+  .sec-educacion{ border-color:#22c55e; background:#f9fafb; }
+  .sec-planeacion{ border-color:#a855f7; background:#f9fafb; }
+  .sec-agro{ border-color:#8b5cf6; background:#f9fafb; }
+  .sec-salud{ border-color:#06b6d4; background:#f9fafb; }
+  .sec-default{ border-color:#9ca3af; background:#f9fafb; }
+
+  /* SECRETARÍAS: COMPLETADO (borde + relleno) */
+  .sec-despacho-filled{ border-color:#f87171; background:#fee2e2; }
+  .sec-gobierno-filled{ border-color:#60a5fa; background:#dbeafe; }
+  .sec-hacienda-filled{ border-color:#facc15; background:#fef3c7; }
+  .sec-educacion-filled{ border-color:#22c55e; background:#dcfce7; }
+  .sec-planeacion-filled{ border-color:#a855f7; background:#ede9fe; }
+  .sec-agro-filled{ border-color:#8b5cf6; background:#f5f3ff; }
+  .sec-salud-filled{ border-color:#06b6d4; background:#cffafe; }
+  .sec-default-filled{ border-color:#9ca3af; background:#e5e7eb; }
+
+  .cal-day-view,
+  .cal-week-view{ border-top:1px solid #eee; }
+  .cal-day-header-row,
+  .cal-week-header-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:6px 10px;
+    background:#f7fafc;
+    border-bottom:1px solid #eee;
+    font-size:.85rem;
+    font-weight:700;
+  }
+  .cal-day-body,
+  .cal-week-body{
+    padding:8px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .cal-year-grid{
+    border-top:1px solid #eee;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:10px;
+    padding:10px;
+  }
+  .cal-year-month{
+    border-radius:12px;
+    background:#f9fafb;
+    padding:8px;
+    box-sizing:border-box;
+  }
+  .cal-year-month h4{
+    margin:0 0 4px;
+    font-size:.8rem;
+    text-align:center;
+    color:#111;
+  }
+  .cal-year-month table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.7rem;
+    text-align:center;
+  }
+  .cal-year-month th{
+    font-weight:700;
+    color:#666;
+    padding:2px 0;
+  }
+  .cal-year-month td{
+    padding:2px 0;
+    color:#111;
+  }
+  .cal-year-dot{
+    width:6px;
+    height:6px;
+    border-radius:999px;
+    display:inline-block;
+    margin-left:2px;
+    background:#22c55e;
+  }
+
+  .cal-footer-actions{
+    margin-top:14px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  /* Leyenda de colores */
+  .cal-legend{
+    margin-top:4px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    font-size:.75rem;
+    color:#6b7280;
+  }
+  .cal-legend-item{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+  }
+  .cal-legend-dot{
+    width:10px;
+    height:10px;
+    border-radius:999px;
+    display:inline-block;
+    border:1px solid transparent;
+  }
+  .cal-legend-despacho{ background:#fee2e2; border-color:#f87171; }
+  .cal-legend-gobierno{ background:#dbeafe; border-color:#60a5fa; }
+  .cal-legend-hacienda{ background:#fef3c7; border-color:#facc15; }
+  .cal-legend-educacion{ background:#dcfce7; border-color:#22c55e; }
+  .cal-legend-planeacion{ background:#ede9fe; border-color:#a855f7; }
+  .cal-legend-agro{ background:#f5f3ff; border-color:#8b5cf6; }
+  .cal-legend-salud{ background:#cffafe; border-color:#06b6d4; }
+
+  @media (max-width: 700px){
+    .cal-legend{ font-size:.7rem; gap:6px; }
+  }
+  @media (max-width: 480px){
+    .cal-legend{ font-size: 0.45rem !important; gap: 2px !important; }
+    .cal-legend-item{ gap: 2px !important; }
+    .cal-legend-dot{ width: 5px !important; height: 5px !important; }
+  }
+
+  /* FORMULARIO REGISTRAR EVENTO */
+  .cal-form-grid{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .cal-checklist{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .cal-check-item{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:4px 8px;
+    border-radius:999px;
+    background:#f3f4f6;
+    font-size:.82rem;
+  }
+  .cal-check-item input[type="checkbox"]{
+    width:16px;
+    height:16px;
+  }
+
+   .contacto-wrap{
+    position:relative;
+    width:100%;
+  }
+  .contacto-wrap input#contacto{
+    width:100%;
+    padding-right:44px;
+  }
+  .contacto-wa-btn{
+    position:absolute;
+    top:50%;
+    right:8px;
+    transform:translateY(-50%);
+    width:32px;
+    height:32px;
+    padding:0 !important;
+    margin:0;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .contacto-wa-btn img{
+    width:26px;
+    height:26px;
+    display:block;
+    object-fit:contain;
+    pointer-events:none;
+  }
+  .contacto-wa-btn:hover img{ transform:scale(1.06); }
+  .contacto-wa-btn:active img{ transform:scale(.92); }
+
+  .picker-modal-cal{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    padding-top:32px;
+    background:rgba(0,0,0,.5);
+    z-index:9999;
+  }
+  .picker-modal-cal[aria-hidden="false"]{
+    display:flex;
+  }
+  .picker-box-cal{
+    width:90%;
+    max-width:520px;
+    background:#fff;
+    border-radius:8px;
+    padding:16px;
+    box-shadow:0 8px 18px rgba(0,0,0,.18);
+  }
+  .picker-grid-cal{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:8px;
+    margin:12px 0;
+  }
+
+/* Forzar que el modal de FECHA DE PUBLICACIÓN quede pegado abajo */
+#publicacionFechaModal{
+  align-items:flex-end;
+  justify-content:center;
+  padding-top:0;
+  padding-bottom:16px;
+}
+
+      /* Vista directorio */
+    .contact-list{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .contact-item{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      background: rgba(255,255,255,.9);
+      border:2px solid #ddd;
+      border-radius:16px;
+      padding:10px 12px;
+      box-shadow:0 6px 14px rgba(0,0,0,.12);
+    }
+    .contact-main{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .contact-name{
+      font-weight:900;
+      color:#06402B;
+    }
+    .contact-address{
+      font-size:.9rem;
+      color:#333;
+    }
+    .contact-actions-row{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+      margin-top:6px;
+    }
+    .contact-actions-row a,
+    .contact-actions-row button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:40px;
+      height:40px;
+      border-radius:10px;
+      border:2px solid var(--primary);
+      background:#fff;
+      box-shadow:0 4px 10px rgba(0,0,0,.16);
+      cursor:pointer;
+    }
+    .contact-actions-row img{
+      width:22px;
+      height:22px;
+      object-fit:contain;
+      border-radius:6px;
+      background:#fff;
+    }
+  </style>
+</head>
+<body>
+ <!-- Loader -->
+<div id="loader" class="loader hidden" aria-live="polite" aria-busy="true">
+  <div class="spinner-ios" role="status" aria-label="Cargando">
+    <i></i><i></i><i></i><i></i><i></i><i></i>
+    <i></i><i></i><i></i><i></i><i></i><i></i>
+  </div>
+</div>
+
+  <div class="container">
+
+    <!-- VISTA INSTALAR -->
+    <section id="view-instalar" class="view">
+      <div class="card narrow" style="text-align:center;">
+        <h2 style="color:var(--primary);">APP COMUNICACIONES</h2>
+        <img class="brand" alt="Instalar" src="https://res.cloudinary.com/dqqeavica/image/upload/v1766349498/slider_zcq18s.gif" />
+        <p style="font-weight:600;">Herramienta de uso exclusivo para el Equipo de Comunicaciones de la Alcaldía de Flandes</p>
+        <div class="btn-row" style="justify-content:center; margin-top:12px;">
+          <button id="btn-instalar" class="btn-primary" style="display:none;">Instalar la App 📲</button>
+        </div>
+        <p class="muted" style="margin-top:14px;">Si ya instalaste la App y no se inicia automáticamente, refresca en unos segundos.</p>
+      </div>
+    </section>
+
+    <!-- VISTA LOGIN -->
+    <section id="view-login" class="view">
+      <div class="card narrow">
+        <h1 style="color:var(--primary); text-shadow: 0 2px 2px #031732;">COMUNICACIONES</h1>
+        <p class="helper"><b>Acceso exclusivo para el Equipo de Comunicaciones de la Alcaldía de Flandes.</b></p>
+
+        <label>Contraseña</label>
+        <div class="pwd-wrapper">
+          <input id="login-cedula" type="password" inputmode="numeric" autocomplete="off" placeholder="Sin puntos ni espacios" />
+          <button type="button" id="toggle-cedula" aria-label="Mostrar cédula" class="toggle-cedula">
+            <img src="https://res.cloudinary.com/dqqeavica/image/upload/v1764084782/Mostrar_yymceh.png" alt="Mostrar">
+          </button>
+        </div>
+
+        <div class="btn-row spaced">
+          <button class="btn-primary" id="btn-login">Iniciar Sesión</button>
+        </div>
+
+        <img class="banner-bottom" alt="Banner" src="https://res.cloudinary.com/dqqeavica/image/upload/v1766347982/banner_wbfbf7.gif" />
+        <p class="center muted">Copyright © <b>GOBIERNO DIGITAL</b></p>
+      </div>
+    </section>
+
+    <!-- VISTA INICIO -->
+    <section id="view-inicio" class="view">
+      <div class="card narrow">
+        <div class="btn-row" style="margin-bottom:12px;">
+          <button class="chip danger" id="btn-logout">Cerrar Sesión</button>
+          <button class="chip" id="btn-open-menu">MENÚ</button>
+        </div>
+
+        <div class="avatar-wrap">
+          <img id="inicio-avatar-emoji" class="avatar-emoji" src="https://res.cloudinary.com/dqqeavica/image/upload/v1758738139/user_zefosv.png" alt="" style="display:none;" />
+          <img id="inicio-avatar-img" class="avatar-img" src="" alt="" style="display:none;" />
+        </div>
+
+        <h2 id="inicio-nombre" style="color:var(--primary); font-weight:900; margin-top:6px;"></h2>
+        <p id="inicio-rol" class="center muted" style="margin-top:0; font-weight:300;">SUPERVISOR(A)</p>
+
+        <img id="inicio-firma" class="firma-preview" src="" alt="Firma" style="display:none;" />
+
+        <img class="brand" alt="Banner" src="https://res.cloudinary.com/dqqeavica/image/upload/v1766347982/banner_wbfbf7.gif" />
+        <p class="center muted">Copyright © <b>GOBIERNO DIGITAL</b></p>
+      </div>
+    </section>
+
+    <!-- OVERLAY MENÚ -->
+    <div class="overlay" id="overlay">
+      <div class="scrim" id="ovlClose"></div>
+      <aside class="panel">
+        <div class="btn-row">
+          <button id="btn-ovl-back">ATRÁS</button>
+        </div>
+        <div class="image-center">
+          <img alt="banner" src="https://res.cloudinary.com/dqqeavica/image/upload/v1766349498/slider_zcq18s.gif" style="max-width:180px;border-radius:10px;" />
+        </div>
+        <h3>Selecciona una opción</h3>
+
+        <!-- SOLO LO QUE DEJAS -->
+        <button class="menu-btn" id="go-comunicados">COMUNICADOS</button>
+        <button class="menu-btn" id="go-calendario">CALENDARIO INSTITUCIONAL</button>
+        <button class="menu-btn" id="go-directorio">DIRECTORIO INSTITUCIONAL</button>
+        <button class="menu-btn" id="go-soporte">SOPORTE</button>
+
+        <div style="height:24px"></div>
+        <img class="brand" alt="Banner" src="https://res.cloudinary.com/dqqeavica/image/upload/v1766347982/banner_wbfbf7.gif" />
+        <p class="center muted">Copyright © <b>GOBIERNO DIGITAL</b></p>
+      </aside>
+    </div>
+
+    <!-- VISTA COMUNICADOS -->
+    <section id="view-comunicados" class="view">
+      <div class="card narrow">
+        <h2 style="color:var(--primary)">EMITE COMUNICADO</h2>
+        <textarea id="comunicado-text" rows="6" placeholder="Escribe tu comunicado"></textarea>
+        <div class="btn-row spaced">
+          <button id="comunicado-enviar" class="btn-primary">Enviar</button>
+          <button id="comunicado-volver" class="danger">Regresar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA SOPORTE -->
+    <section id="view-soporte" class="view">
+      <div class="card narrow">
+        <h2 style="color:var(--primary)">¿QUÉ NECESITAS?</h2>
+        <textarea id="soporte-text" rows="6" placeholder="Redacta detalladamente tu pregunta o sugerencia"></textarea>
+        <div class="btn-row spaced">
+          <button id="soporte-enviar" class="btn-primary">Enviar</button>
+          <button id="soporte-volver" class="danger">Regresar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA DIRECTORIO INSTITUCIONAL -->
+    <section id="view-directorio" class="view">
+      <div class="card narrow">
+        <h2 style="color:var(--primary)">DIRECTORIO INSTITUCIONAL</h2>
+        <div id="dir-list" class="contact-list"></div>
+        <div class="btn-row spaced">
+          <button id="dir-volver" class="danger">REGRESAR</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA CALENDARIO INSTITUCIONAL -->
+    <section id="view-calendario" class="view">
+      <div class="card">
+        <div class="cal-wrapper">
+          <h2 style="color:var(--primary)">CALENDARIO INSTITUCIONAL</h2>
+
+          <div class="cal-header">
+            <div>
+              <div class="cal-title" id="cal-title-text">Mes actual</div>
+              <p class="muted" style="margin:2px 0 0;">Vista interactiva de eventos programados y completados</p>
+            </div>
+            <div class="cal-nav-group">
+              <button id="cal-btn-today" class="cal-pill-btn">Hoy</button>
+              <button id="cal-prev" class="cal-pill-btn" aria-label="Anterior">‹</button>
+              <button id="cal-next" class="cal-pill-btn" aria-label="Siguiente">›</button>
+            </div>
+            <div class="cal-filter-wrap">
+              <button id="cal-filter-toggle" class="cal-pill-btn">Filtrar</button>
+              <input id="cal-filter-input" class="cal-filter-input" type="text" placeholder="Filtrar por evento, secretaría o responsable" style="display:none;">
+            </div>
+            <div class="cal-nav-group">
+              <button id="cal-view-day" class="cal-pill-btn">Día</button>
+              <button id="cal-view-week" class="cal-pill-btn">Semana</button>
+              <button id="cal-view-month" class="cal-pill-btn active">Mes</button>
+              <button id="cal-view-year" class="cal-pill-btn">Año</button>
+            </div>
+          </div>
+
+          <!-- LEYENDA DE COLORES -->
+          <div class="cal-legend">
+            <span class="cal-legend-item">
+              <span class="cal-legend-dot cal-legend-despacho"></span>
+              DESPACHO MUNICIPAL
+            </span>
+            <span class="cal-legend-item">
+              <span class="cal-legend-dot cal-legend-gobierno"></span>
+              SECRETARÍA DE GOBIERNO Y SERVICIOS ADMINISTRATIVOS
+            </span>
+            <span class="cal-legend-item">
+              <span class="cal-legend-dot cal-legend-hacienda"></span>
+              SECRETARÍA DE HACIENDA
+            </span>
+            <span class="cal-legend-item">
+              <span class="cal-legend-dot cal-legend-educacion"></span>
+              SECRETARÍA DE EDUCACIÓN, DESARROLLO ECONÓMICO Y SOCIAL
+            </span>
+            <span class="cal-legend-item">
+              <span class="cal-legend-dot cal-legend-planeacion"></span>
+              SECRETARÍA DE PLANEACIÓN E INFRAESTRUCTURA
+            </span>
+            <span class="cal-legend-item">
+              <span class="cal-legend-dot cal-legend-agro"></span>
+              SECRETARÍA DE ASUNTOS AGROPECUARIOS
+            </span>
+            <span class="cal-legend-item">
+              <span class="cal-legend-dot cal-legend-salud"></span>
+              SECRETARÍA DE SALUD
+            </span>
+          </div>
+
+          <div id="cal-container" class="cal-grid">
+            <div style="padding:14px; text-align:center; font-size:.9rem;" class="muted">
+              Cargando calendario…
+            </div>
+          </div>
+
+          <div class="cal-footer-actions">
+            <button id="cal-btn-new" class="btn-primary">Ingresar Evento</button>
+            <button id="cal-btn-back" class="danger">Regresar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA REGISTRAR / EDITAR EVENTO -->
+    <section id="view-evento" class="view">
+      <div class="card narrow">
+        <h2 id="evento-title" style="color:var(--primary)">REGISTRAR EVENTO</h2>
+        <div class="cal-form-grid">
+
+          <label for="nombreEvento">Nombre del Evento</label>
+          <textarea id="nombreEvento" rows="2" placeholder="Título descriptivo del evento"></textarea>
+
+          <label>Fecha del Evento</label>
+          <input
+            id="fechaEvento"
+            type="text"
+            placeholder="dd/mm/aaaa"
+            readonly
+          />
+
+          <label for="horaInicio">Hora de Inicio</label>
+          <input id="horaInicio" type="time">
+
+          <label for="horaTerminacion">Hora de Terminación</label>
+          <input id="horaTerminacion" type="time">
+
+          <label for="secretaria">Secretaría</label>
+          <select id="secretaria">
+            <option value="" disabled selected>Selecciona secretaría</option>
+            <option value="DESPACHO MUNICIPAL">DESPACHO MUNICIPAL</option>
+            <option value="SECRETARÍA DE GOBIERNO Y SERVICIOS ADMINISTRATIVOS">SECRETARÍA DE GOBIERNO Y SERVICIOS ADMINISTRATIVOS</option>
+            <option value="SECRETARÍA DE HACIENDA">SECRETARÍA DE HACIENDA</option>
+            <option value="SECRETARÍA DE EDUCACIÓN, DESARROLLO ECONÓMICO Y SOCIAL">SECRETARÍA DE EDUCACIÓN, DESARROLLO ECONÓMICO Y SOCIAL</option>
+            <option value="SECRETARÍA DE PLANEACIÓN E INFRAESTRUCTURA">SECRETARÍA DE PLANEACIÓN E INFRAESTRUCTURA</option>
+            <option value="SECRETARÍA DE ASUNTOS AGROPECUARIOS">SECRETARÍA DE ASUNTOS AGROPECUARIOS</option>
+            <option value="SECRETARÍA DE SALUD">SECRETARÍA DE SALUD</option>
+          </select>
+
+          <label>Requerimientos</label>
+          <div id="requerimientos" class="cal-checklist">
+            <label class="cal-check-item">
+              <input type="checkbox" value="Cubrimiento Fotográfico">
+              <span>Cubrimiento Fotográfico</span>
+            </label>
+            <label class="cal-check-item">
+              <input type="checkbox" value="Cubrimiento Video">
+              <span>Cubrimiento Video</span>
+            </label>
+            <label class="cal-check-item">
+              <input type="checkbox" value="Diseño Pieza Publicitaria">
+              <span>Diseño Pieza Publicitaria</span>
+            </label>
+            <label class="cal-check-item">
+              <input type="checkbox" value="Perifoneo">
+              <span>Perifoneo</span>
+            </label>
+            <label class="cal-check-item">
+              <input type="checkbox" value="Apoyo Publicitario">
+              <span>Apoyo Publicitario</span>
+            </label>
+            <label class="cal-check-item">
+              <input type="checkbox" value="Producción Multimedia">
+              <span>Producción Multimedia</span>
+            </label>
+            <label class="cal-check-item">
+              <input type="checkbox" value="Publicación Página Web">
+              <span>Publicación Página Web</span>
+            </label>
+          </div>
+
+          <label for="otros">Otros</label>
+          <textarea id="otros" rows="2" placeholder="Requerimientos adicionales (opcional)"></textarea>
+
+          <label for="lugar">Lugar del Evento</label>
+          <textarea id="lugar" rows="2" placeholder="Lugar o puntos de encuentro (opcional)"></textarea>
+
+          <label for="detalles">Detalles del Evento o Requerimiento</label>
+          <textarea id="detalles" rows="6" placeholder="Describe el objetivo, participantes, logística u otra información relevante (opcional)"></textarea>
+
+          <label>Fecha de Publicación</label>
+          <input
+            id="publicacion"
+            type="text"
+            placeholder="dd/mm/aaaa"
+            readonly
+          />
+
+          <label for="nombre">Responsable</label>
+          <input id="nombre" type="text" list="dl-responsables" placeholder="Escribe y selecciona">
+          <datalist id="dl-responsables"></datalist>
+
+          <label for="contacto">Contacto (automático)</label>
+          <div class="contacto-wrap">
+            <input id="contacto" type="text" readonly>
+            <button
+              type="button"
+              id="contacto-wa-btn"
+              class="btn-icon contacto-wa-btn"
+              aria-label="Abrir WhatsApp con el contacto"
+              title="Abrir WhatsApp"
+            >
+              <img
+                src="https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp"
+                alt="WhatsApp"
+              >
+            </button>
+          </div>
+
+          <label for="cargo">Cargo del Responsable</label>
+          <textarea id="cargo" rows="2" placeholder="Escribe el cargo del Responsable (opcional)"></textarea>
+
+          <input id="evento-codigo" type="hidden">
+        </div>
+
+        <div class="btn-row spaced" style="margin-top:14px;">
+          <button id="evento-guardar" class="btn-primary">Guardar Evento</button>
+          <button id="evento-volver" class="danger">Regresar</button>
+        </div>
+      </div>
+
+      <!-- Modal Fecha Evento (parte superior) -->
+      <div id="eventoFechaModal" class="picker-modal-cal" aria-hidden="true">
+        <div class="picker-box-cal">
+          <h3 style="margin:0 0 8px 0;">Selecciona la Fecha del Evento</h3>
+          <div class="picker-grid-cal">
+            <div>
+              <small>Día</small>
+              <select id="evtDia" size="10"></select>
+            </div>
+            <div>
+              <small>Mes</small>
+              <select id="evtMes" size="12"></select>
+            </div>
+            <div>
+              <small>Año</small>
+              <select id="evtAnio" size="10"></select>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; justify-content:flex-end;">
+            <button type="button" class="btn" id="evtFechaCancelar">Cancelar</button>
+            <button type="button" class="btn-primary" id="evtFechaOk">Ok</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Fecha Publicación (parte inferior) -->
+      <div id="publicacionFechaModal" class="picker-modal-cal" aria-hidden="true">
+        <div class="picker-box-cal">
+          <h3 style="margin:0 0 8px 0;">Selecciona la Fecha de Publicación</h3>
+          <div class="picker-grid-cal">
+            <div>
+              <small>Día</small>
+              <select id="pubDia" size="10"></select>
+            </div>
+            <div>
+              <small>Mes</small>
+              <select id="pubMes" size="12"></select>
+            </div>
+            <div>
+              <small>Año</small>
+              <select id="pubAnio" size="10"></select>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; justify-content:flex-end;">
+            <button type="button" class="btn" id="pubFechaCancelar">Cancelar</button>
+            <button type="button" class="btn-primary" id="pubFechaOk">Ok</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+<script>
+/* ================== CONFIGURACIÓN ================== */
+const API_BASE = 'https://script.google.com/macros/s/AKfycbzHH5u3VuZU0g3oef7qATHi1blNKsVZQu3PAHt2mfO8lsXTkQOQ6gLfNenkfOl9YHIsbw/exec';
+
+/* ================== SONIDOS ================== */
+const SOUNDS = {
+  question: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Pay_fail_ls2aif.mp3',
+  info: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Default_notification_pkp4wr.mp3',
+  success: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Pay_success_t5aawh.mp3',
+  error: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Low_battery_d5qua1.mp3',
+  warning: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Low_battery_d5qua1.mp3',
+  login: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Siri_star_g1owy4.mp3',
+  logout: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Siri_End_kelv02.mp3',
+  back: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011578/Keyboard_Enter_b9k2dc.mp3',
+  menu: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Namedrop_Popup_ale2zy.mp3'
+};
+function playSoundOnce(url){
+  try{
+    const a = new Audio(url);
+    a.preload = 'auto';
+    a.play().catch(()=>{});
+  }catch(e){}
+}
+if (window.Swal && typeof Swal.fire === 'function'){
+  const __fire = Swal.fire.bind(Swal);
+  Swal.fire = function(options = {}, ...rest){
+    try{
+      const icon = options.icon || options.type;
+      if (icon && SOUNDS[icon]) playSoundOnce(SOUNDS[icon]);
+    }catch(e){}
+    return __fire(options, ...rest);
+  }
+}
+
+/* ================== LOADER ================== */
+const loader = document.getElementById('loader');
+let loadingCount = 0;
+let loaderTimer = null;
+
+function startLoading(){
+  loadingCount++;
+  if (loadingCount === 1){
+    loaderTimer = setTimeout(()=>{ loader.classList.remove('hidden'); loaderTimer = null; }, 120);
+  }
+}
+function stopLoading(){
+  if (loadingCount === 0) return;
+  loadingCount--;
+  if (loadingCount === 0){
+    if (loaderTimer){ clearTimeout(loaderTimer); loaderTimer = null; }
+    loader.classList.add('hidden');
+  }
+}
+
+/* ================== API ================== */
+async function apiGet(action, params = {}){
+  startLoading();
+  try{
+    const url = new URL(API_BASE);
+    url.search = new URLSearchParams({ action, ...params }).toString();
+    const r = await fetch(url.toString(), { method: 'GET' });
+    const j = await r.json();
+    if(!j.ok) throw new Error(j.error || 'Error');
+    return j.data;
+  } finally { stopLoading(); }
+}
+async function apiPost(action, body = {}){
+  startLoading();
+  try{
+    const url = API_BASE + '?action=' + encodeURIComponent(action);
+    const r = await fetch(url, {
+      method:'POST',
+      headers: { 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify(body)
+    });
+    const j = await r.json();
+    if(!j.ok) throw new Error(j.error || 'Error');
+    return j.data;
+  } finally { stopLoading(); }
+}
+
+/* ================== ESTADO ================== */
+let currentUser = null;  // { cedula, supervisor, firmaId, imagenId }
+let supervisorNombreCompleto = ''; // Col C
+
+/* ================== VISTAS ================== */
+function showView(id){
+  for(const el of document.querySelectorAll('.view')) el.classList.remove('active');
+  const v = document.getElementById(id);
+  if(v) v.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ================== LOGIN ================== */
+const loginCedula = document.getElementById('login-cedula');
+document.getElementById('toggle-cedula').addEventListener('click', ()=>{
+  const oculto = loginCedula.type === 'password';
+  loginCedula.type = oculto ? 'text' : 'password';
+  const nuevoIcono = oculto
+    ? 'https://res.cloudinary.com/dqqeavica/image/upload/v1764084782/Ocultar_lgdxpd.png'
+    : 'https://res.cloudinary.com/dqqeavica/image/upload/v1764084782/Mostrar_yymceh.png';
+  const accion = oculto ? 'Ocultar' : 'Mostrar';
+  document.getElementById('toggle-cedula').setAttribute('aria-label', accion + ' cédula');
+  document.getElementById('toggle-cedula').innerHTML = '<img src="'+nuevoIcono+'" alt="'+accion+'">';
+});
+document.getElementById('btn-login').addEventListener('click', async ()=>{
+  const cedula = (loginCedula.value||'').trim();
+  if(!/^\d{6,10}$/.test(cedula)){
+    Swal.fire({icon:'warning',title:'¿Deseas Iniciar Sesión?',text:'Ingresa tu Contraseña'}); return;
+  }
+  try{
+    const res = await apiGet('loginSupervisor', { cedula });
+    if(!res || !res.encontrado){
+      // WhatsApp soporte
+      const soporte = '573103230712';
+      const mensaje = 'Buen día *Oscar*%0A%0ANo tengo acceso a la app de Supervisión.%0A' +
+        'Mi contraseña: *' + cedula + '*%0A' +
+        'Te dejo mis datos a continuación:%0A*Nombre Completo:*%0A*Celular:*';
+      const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
+      const urlWA = esMovil
+        ? 'whatsapp://send?phone=' + soporte + '&text=' + mensaje
+        : 'https://api.whatsapp.com/send?phone=' + soporte + '&text=' + mensaje;
+
+      const rs = await Swal.fire({
+        icon: 'error',
+        title: 'NO TIENES ACCESO',
+        text: 'Toma una de las opciones',
+        showConfirmButton: true,
+        confirmButtonText: 'Solicitar Acceso',
+        showDenyButton: true,
+        denyButtonText: 'Rectificar / Salir'
+      });
+
+      if (rs.isConfirmed){
+        window.open(urlWA, '_blank');
+        await Swal.fire({
+          icon: 'success',
+          title: 'Se abrió WhatsApp',
+          text: 'Solicita tu habilitación por ese medio.',
+          timer: 6000,
+          showConfirmButton: false
+        });
+        return;
+      } else if (rs.isDenied){
+        loginCedula.value = '';
+        return;
+      }
+    }
+
+    currentUser = { cedula, supervisor: res.supervisor || '', firmaId: res.firmaId || '', imagenId: res.imagenId || '' };
+    supervisorNombreCompleto = res.supervisor || '';
+
+    playSoundOnce(SOUNDS.login);
+
+    renderInicio();
+    showView('view-inicio');
+  }catch(e){
+    Swal.fire({icon:'error',title:'Error',text:e.message});
+  }
+});
+document.getElementById('btn-logout').addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.logout);
+  currentUser = null; supervisorNombreCompleto = '';
+  loginCedula.value = '';
+  showView('view-login');
+});
+
+/* ================== INICIO ================== */
+function driveThumbById(id){ return id ? ('https://drive.google.com/thumbnail?sz=w1000&id='+id) : ''; }
+function renderInicio(){
+  const imgEl   = document.getElementById('inicio-avatar-img');
+  const emojiEl = document.getElementById('inicio-avatar-emoji');
+  const hasImagen = !!currentUser?.imagenId;
+
+  imgEl.onload = () => { imgEl.style.display=''; emojiEl.style.display='none'; };
+  imgEl.onerror = () => { imgEl.style.display='none'; emojiEl.style.display=''; };
+
+  if(hasImagen){
+    imgEl.style.display='none';
+    emojiEl.style.display='none';
+    imgEl.src = driveThumbById(currentUser.imagenId);
+  }else{
+    imgEl.style.display='none';
+    emojiEl.style.display='';
+  }
+
+  document.getElementById('inicio-nombre').textContent = supervisorNombreCompleto;
+  const rolEl = document.getElementById('inicio-rol');
+  if(rolEl) rolEl.textContent = 'SUPERVISOR(A)';
+
+  const firmaEl = document.getElementById('inicio-firma');
+  const hasFirma = !!currentUser?.firmaId;
+  if(hasFirma){
+    firmaEl.src = driveThumbById(currentUser.firmaId);
+    firmaEl.style.display='';
+  }else{
+    firmaEl.style.display='none';
+  }
+}
+
+/* ================== OVERLAY MENÚ ================== */
+const overlay = document.getElementById('overlay');
+
+document.getElementById('btn-open-menu').addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.menu);
+  overlay.classList.add('open');
+});
+document.getElementById('btn-ovl-back').addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.back);
+  overlay.classList.remove('open');
+});
+document.getElementById('ovlClose').addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.back);
+  overlay.classList.remove('open');
+});
+
+/* Sonido 'logout' al seleccionar cualquiera de las opciones del overlay. */
+['go-comunicados','go-calendario','go-directorio','go-soporte']
+  .forEach(id => {
+    const el = document.getElementById(id);
+    if(el){
+      el.addEventListener('click', ()=>{
+        playSoundOnce(SOUNDS.logout);
+        overlay.classList.remove('open');
+      });
+    }
+  });
+
+/* ================== COMUNICADOS ================== */
+document.getElementById('go-comunicados').addEventListener('click', ()=>{ overlay.classList.remove('open'); showView('view-comunicados'); });
+document.getElementById('comunicado-enviar').addEventListener('click', async ()=>{
+  const txt=(document.getElementById('comunicado-text').value||'').trim();
+  if(!txt){ Swal.fire({icon:'warning',title:'Texto requerido'}); return; }
+  try{
+    await apiPost('guardarComunicadoSupervisor',{
+      supervisor: supervisorNombreCompleto,
+      comunicado: txt,
+      imagenId: currentUser?.imagenId || ''
+    });
+    Swal.fire({icon:'success',title:'COMUNICADO CARGADO CON ÉXITO',timer:4000,showConfirmButton:false});
+    document.getElementById('comunicado-text').value='';
+    renderInicio(); showView('view-inicio');
+  }catch(e){ Swal.fire({icon:'error',title:'Error',text:e.message}); }
+});
+document.getElementById('comunicado-volver').addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.back);
+  showView('view-inicio');
+});
+
+/* ================== SOPORTE ================== */
+document.getElementById('go-soporte').addEventListener('click', ()=>{ overlay.classList.remove('open'); showView('view-soporte'); });
+document.getElementById('soporte-enviar').addEventListener('click', async ()=>{
+  const txt=(document.getElementById('soporte-text').value||'').trim();
+  if(!txt){ Swal.fire({icon:'warning',title:'Texto requerido'}); return; }
+  try{
+    await apiPost('guardarSoporteSupervisor',{
+      supervisor: supervisorNombreCompleto,
+      soporte: txt,
+      celular: ''
+    });
+    Swal.fire({icon:'success',title:'SOLICITUD CARGADA CON ÉXITO',timer:4000,showConfirmButton:false});
+    document.getElementById('soporte-text').value='';
+    renderInicio(); showView('view-inicio');
+  }catch(e){ Swal.fire({icon:'error',title:'Error',text:e.message}); }
+});
+document.getElementById('soporte-volver').addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.back);
+  showView('view-inicio');
+});
+
+/* ================== DIRECTORIO INSTITUCIONAL ================== */
+const ICON_DIR_MAPS   = 'https://res.cloudinary.com/dqqeavica/image/upload/v1760108968/ubicacion_zicnod.png';
+const ICON_DIR_MAIL   = 'https://res.cloudinary.com/dqqeavica/image/upload/v1766266810/correo_czyyra.webp';
+const ICON_DIR_WA     = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759166341/WhatsApp_mljaqm.webp';
+const ICON_DIR_TEL    = 'https://res.cloudinary.com/dqqeavica/image/upload/v1759952569/Llamada_hra2ch.webp';
+const ICON_DIR_SHARE  = 'https://res.cloudinary.com/dqqeavica/image/upload/v1766267125/compartir_szoxv7.webp';
+
+function normalizePhoneDigits(raw){ return String(raw || '').replace(/\D/g,''); }
+
+function openWhatsAppFromNumber(raw){
+  const digits = normalizePhoneDigits(raw);
+  if(!digits) return;
+  let num = digits;
+  if(/^\d{10}$/.test(num)) num = '57' + num;
+  const url = 'https://wa.me/' + num;
+  window.open(url, '_blank');
+}
+function openTelFromNumber(raw){
+  const digits = normalizePhoneDigits(raw);
+  if(!digits) return;
+  window.location.href = 'tel:' + digits;
+}
+function buildShareText(item){
+  const nombre   = item.nombre   || '';
+  const dir      = item.direccion|| '';
+  const maps     = item.maps     || '';
+  const correo   = item.correo   || '';
+  const wa       = item.whatsapp || '';
+  const tel      = item.telefono || '';
+
+  const waDigits = normalizePhoneDigits(wa);
+  const waUrl    = waDigits ? ('wa.me/' + waDigits) : '';
+
+  return (
+    '*INFORMACIÓN DE CONTACTO:*\n\n' +
+    '*CONTACTO:* ' + (nombre || '-') + '\n' +
+    '*DIRECCIÓN:* ' + (dir || '-') + '\n' +
+    '*UBICACIÓN:* ' + (maps || '-') + '\n' +
+    '*CORREO:* ' + (correo || '-') + '\n' +
+    '*WHATSAPP:* ' + (waUrl || '-') + '\n' +
+    '*TELEFONO:* ' + (tel || '-')
+  );
+}
+function buildClipboardText(item){
+  const nombre   = item.nombre   || '';
+  const dir      = item.direccion|| '';
+  const correo   = item.correo   || '';
+  const wa       = item.whatsapp || '';
+  const tel      = item.telefono || '';
+
+  return (
+    'CONTACTO: ' + (nombre || '-') + '\n' +
+    'DIRECCIÓN: ' + (dir || '-') + '\n' +
+    'CORREO: ' + (correo || '-') + '\n' +
+    'WHATSAPP: ' + (wa || '-') + '\n' +
+    'TELEFONO: ' + (tel || '-')
+  );
+}
+async function showDirectorioShareDialog(item){
+  const html =
+    '<b>CONTACTO:</b> ' + (item.nombre || '-') + '<br>' +
+    '<b>DIRECCIÓN:</b> ' + (item.direccion || '-') + '<br>' +
+    '<b>CORREO:</b> ' + (item.correo || '-') + '<br>' +
+    '<b>WHATSAPP:</b> ' + (item.whatsapp || '-') + '<br>' +
+    '<b>TELEFONO:</b> ' + (item.telefono || '-');
+
+  const result = await Swal.fire({
+    icon:'success',
+    title:'Información de Contacto',
+    html:html,
+    showDenyButton:true,
+    showCancelButton:true,
+    confirmButtonText:'Copiar Portapapeles',
+    denyButtonText:'Compartir',
+    cancelButtonText:'Atrás'
+  });
+
+  if(result.isConfirmed){
+    const text = buildClipboardText(item);
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+      }
+      await Swal.fire({ icon:'success', title:'Información Copiada', timer:2000, showConfirmButton:false });
+    }catch(e){
+      await Swal.fire({ icon:'error', title:'No se pudo copiar', text:String(e.message||e) });
+    }
+    return;
+  }
+
+  if(result.isDenied){
+    const shareText = buildShareText(item);
+    const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent || '');
+    const enc = encodeURIComponent(shareText);
+    const url = esMovil ? 'whatsapp://send?text=' + enc : 'https://api.whatsapp.com/send?text=' + enc;
+    window.open(url,'_blank');
+  }
+}
+
+function renderDirectorio(items){
+  const wrap = document.getElementById('dir-list');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+
+  if(!items.length){
+    const p = document.createElement('p');
+    p.className = 'muted center';
+    p.textContent = 'No hay contactos institucionales disponibles.';
+    wrap.appendChild(p);
+    return;
+  }
+
+  items.forEach(it => {
+    const item = document.createElement('div');
+    item.className = 'contact-item';
+
+    const main = document.createElement('div');
+    main.className = 'contact-main';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'contact-name';
+    nameEl.textContent = it.nombre || '';
+
+    const addrEl = document.createElement('div');
+    addrEl.className = 'contact-address';
+    addrEl.textContent = it.direccion || '';
+
+    main.appendChild(nameEl);
+    main.appendChild(addrEl);
+    item.appendChild(main);
+
+    const actions = document.createElement('div');
+    actions.className = 'contact-actions-row';
+
+    if(it.maps){
+      const a = document.createElement('a');
+      a.href = it.maps;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      const img = document.createElement('img');
+      img.src = ICON_DIR_MAPS;
+      img.alt = '';
+      a.appendChild(img);
+      actions.appendChild(a);
+    }
+
+    if(it.correo){
+      const a = document.createElement('a');
+      a.href = 'mailto:' + it.correo;
+      const img = document.createElement('img');
+      img.src = ICON_DIR_MAIL;
+      img.alt = '';
+      a.appendChild(img);
+      actions.appendChild(a);
+    }
+
+    if(it.whatsapp){
+      const a = document.createElement('a');
+      a.href = 'javascript:void(0)';
+      a.addEventListener('click', ()=> openWhatsAppFromNumber(it.whatsapp));
+      const img = document.createElement('img');
+      img.src = ICON_DIR_WA;
+      img.alt = '';
+      a.appendChild(img);
+      actions.appendChild(a);
+    }
+
+    if(it.telefono){
+      const a = document.createElement('a');
+      a.href = 'javascript:void(0)';
+      a.addEventListener('click', ()=> openTelFromNumber(it.telefono));
+      const img = document.createElement('img');
+      img.src = ICON_DIR_TEL;
+      img.alt = '';
+      a.appendChild(img);
+      actions.appendChild(a);
+    }
+
+    const btnShare = document.createElement('button');
+    const imgShare = document.createElement('img');
+    imgShare.src = ICON_DIR_SHARE;
+    imgShare.alt = '';
+    btnShare.appendChild(imgShare);
+    btnShare.addEventListener('click', ()=> showDirectorioShareDialog(it));
+    actions.appendChild(btnShare);
+
+    item.appendChild(actions);
+    wrap.appendChild(item);
+  });
+}
+
+document.getElementById('go-directorio')?.addEventListener('click', async ()=>{
+  playSoundOnce(SOUNDS.login);
+  overlay.classList.remove('open');
+
+  if(!currentUser){
+    Swal.fire({icon:'warning', title:'Sesión inválida'});
+    return;
+  }
+  try{
+    const list = await apiGet('listDirectorio', {});
+    renderDirectorio(Array.isArray(list) ? list : []);
+    showView('view-directorio');
+  }catch(e){
+    Swal.fire({icon:'error', title:'Error', text:String(e.message||e)});
+  }
+});
+document.getElementById('dir-volver')?.addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.back);
+  showView('view-inicio');
+});
+
+/* ================== PWA AVANZADO ================== */
+let deferredPrompt = null;
+
+function isStandalone(){
+  const dmStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  const dmInstalled  = window.matchMedia('(display-mode: installed)').matches;
+  const iosStandalone = (window.navigator.standalone === true);
+  return dmStandalone || dmInstalled || iosStandalone;
+}
+function isIOS(){
+  return /(iphone|ipad|ipod)/i.test(navigator.userAgent || '');
+}
+function isMarkedInstalled(){
+  try{ return localStorage.getItem('pwaInstalledFlag') === '1'; }catch(_){ return false; }
+}
+function markInstalled(){
+  try{ localStorage.setItem('pwaInstalledFlag', '1'); }catch(_){}
+}
+function clearInstalledMark(){
+  try{ localStorage.removeItem('pwaInstalledFlag'); }catch(_){}
+}
+async function detectInstalled(){
+  if (isStandalone()) return true;
+  if (typeof navigator.getInstalledRelatedApps === 'function'){
+    try{
+      const apps = await navigator.getInstalledRelatedApps();
+      const found = apps.some(a =>
+        a.platform === 'webapp' &&
+        typeof a.url === 'string' &&
+        /manifest\.webmanifest$/.test(a.url)
+      );
+      if (found){
+        markInstalled();
+        return true;
+      } else {
+        clearInstalledMark();
+      }
+    }catch(_){}
+  }
+  return isMarkedInstalled();
+}
+function updateInstallButtonsVisibility(){
+  const btn1 = document.getElementById('btn-instalar');
+  const canPrompt = !!deferredPrompt;
+  const installed = isMarkedInstalled() || isStandalone();
+  const shouldShow = !installed && (canPrompt || isIOS());
+  if(btn1) btn1.style.display = shouldShow ? '' : 'none';
+}
+
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  updateInstallButtonsVisibility();
+});
+
+window.addEventListener('appinstalled', ()=>{
+  markInstalled();
+  deferredPrompt = null;
+  updateInstallButtonsVisibility();
+});
+
+document.getElementById('btn-instalar').addEventListener('click', async ()=>{
+  if(isIOS()){
+    Swal.fire({
+      icon:'info',
+      title: '¡Para Instalar en tu Iphone!',
+      html: `
+        <div style="text-align:center; margin-top:8px;">
+          <img
+            src="https://res.cloudinary.com/dqqeavica/image/upload/v1765745210/instalacion_ios_ysbhnd.gif"
+            alt="Instalación de IOS"
+            style="width:180px; max-width:70vw; height:auto; display:block; margin:0 auto 12px;"
+          >
+          <div style="margin-top:10px;">
+            <b>1.</b> Toca Compartir.<br><b>2.</b> Elige "Agregar a pantalla de inicio".<br><b>3.</b> Confirma "Agregar".
+          </div>
+        </div>
+      `,
+    });
+    return;
+  }
+  if(!deferredPrompt){
+    Swal.fire({icon:'info',title:'Instalación no disponible todavía'});
+    return;
+  }
+
+  const dp = deferredPrompt;
+  dp.prompt();
+  const choice = await dp.userChoice;
+  deferredPrompt = null;
+
+  if (choice.outcome === 'accepted'){
+    markInstalled();
+    Swal.fire({
+      icon: 'success',
+      title: '¡App instalándose!',
+      html: `
+        <div style="text-align:center; margin-top:8px;">
+          <img
+            src="https://res.cloudinary.com/dqqeavica/image/upload/v1765740540/instalacion_lydtcl.gif"
+            alt="Instalando app"
+            style="width:180px; max-width:70vw; height:auto; display:block; margin:0 auto 12px;"
+          >
+          <div>Debes esperar unos segundos mientras el sistema instala la App.</div>
+          <div style="margin-top:10px;">
+            <b>Al desaparecer este aviso, puedes salir de esta vista. La App aparecerá en la pantalla principal de este dispositivo.</b>
+          </div>
+        </div>
+      `,
+      timer: 12000,
+      showConfirmButton: false
+    });
+  } else {
+    Swal.fire({icon:'info',title:'Instalación cancelada'});
+  }
+
+  updateInstallButtonsVisibility();
+});
+
+async function initPWAVista(){
+  const installed = await detectInstalled();
+  if (installed){
+    showView('view-login');
+  } else {
+    showView('view-instalar');
+    updateInstallButtonsVisibility();
+  }
+}
+if ('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+window.addEventListener('load', initPWAVista);
+
+/* ================== CALENDARIO INSTITUCIONAL ================== */
+
+const CAL_API_ACTION_LIST = 'listEventosCalendario';
+const CAL_API_ACTION_SAVE = 'guardarEventoCalendario';
+const CAL_API_ACTION_GET  = 'getEventoCalendario';
+
+let CAL_EVENTS = [];
+let CAL_CURRENT_VIEW = 'month';
+let CAL_CURRENT_DATE = new Date();
+let CAL_SELECTED_EVENT = null;
+
+const CAL_MONTHS_SHORT = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+const CAL_WEEKDAYS_SHORT = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+
+function calPad2(n){ return String(n).padStart(2,'0'); }
+function calFormatDMY(d){
+  if(!d) return '';
+  const dd = calPad2(d.getDate());
+  const mm = calPad2(d.getMonth()+1);
+  const yy = d.getFullYear();
+  return dd + '/' + mm + '/' + yy;
+}
+function calParseDMY(str){
+  if(!str) return null;
+  const p = String(str).split('/');
+  if(p.length !== 3) return null;
+  const d = parseInt(p[0],10);
+  const m = parseInt(p[1],10);
+  const y = parseInt(p[2],10);
+  if(!d || !m || !y) return null;
+  const dt = new Date(y,m-1,d);
+  if(isNaN(dt.getTime())) return null;
+  return dt;
+}
+function calMinutesFromTimeStr(str){
+  if(!str) return 0;
+  const p = String(str).split(':');
+  const h = parseInt(p[0]||'0',10);
+  const m = parseInt(p[1]||'0',10);
+  if(isNaN(h) || isNaN(m)) return 0;
+  return h*60 + m;
+}
+function calHMFromAmPm(str){
+  if(!str) return {h:0,m:0};
+  const s = String(str).trim().toUpperCase();
+  const parts = s.split(' ');
+  const hm = (parts[0]||'').split(':');
+  let h = parseInt(hm[0]||'0',10);
+  const m = parseInt(hm[1]||'0',10);
+  const ampm = parts[1] || 'AM';
+  if(ampm === 'PM' && h < 12) h += 12;
+  if(ampm === 'AM' && h === 12) h = 0;
+  return {h:isNaN(h)?0:h, m:isNaN(m)?0:m};
+}
+
+function calStatusColorClass(estado, secretaria){
+  const v = String(secretaria || '').trim().toUpperCase();
+  const st = String(estado || '').trim().toUpperCase();
+
+  let base;
+  if (v === 'DESPACHO MUNICIPAL') base = 'sec-despacho';
+  else if (v === 'SECRETARÍA DE GOBIERNO Y SERVICIOS ADMINISTRATIVOS') base = 'sec-gobierno';
+  else if (v === 'SECRETARÍA DE HACIENDA') base = 'sec-hacienda';
+  else if (v === 'SECRETARÍA DE EDUCACIÓN, DESARROLLO ECONÓMICO Y SOCIAL') base = 'sec-educacion';
+  else if (v === 'SECRETARÍA DE PLANEACIÓN E INFRAESTRUCTURA') base = 'sec-planeacion';
+  else if (v === 'SECRETARÍA DE ASUNTOS AGROPECUARIOS') base = 'sec-agro';
+  else if (v === 'SECRETARÍA DE SALUD') base = 'sec-salud';
+  else base = 'sec-default';
+
+  if (st === 'COMPLETADO') return 'cal-event-chip ' + base + '-filled';
+  if (st === 'PROGRAMADO') return 'cal-event-chip ' + base;
+  return 'cal-event-chip ' + base;
+}
+function calEventMatchesFilter(ev, query){
+  if(!query) return true;
+  const q = query.toLowerCase();
+  return [ev.nombreEvento, ev.secretaria, ev.nombre, ev.lugar, ev.detalles]
+    .some(v => String(v||'').toLowerCase().includes(q));
+}
+function calStartOfWeek(d){
+  const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = dt.getDay();
+  const diff = (day + 7 - 0) % 7;
+  dt.setDate(dt.getDate() - diff);
+  return dt;
+}
+function calEndOfWeek(d){
+  const start = calStartOfWeek(d);
+  return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+}
+function calUpdateTitle(){
+  const titleEl = document.getElementById('cal-title-text');
+  if(!titleEl) return;
+  if(CAL_CURRENT_VIEW === 'year'){
+    titleEl.textContent = CAL_CURRENT_DATE.getFullYear();
+    return;
+  }
+  if(CAL_CURRENT_VIEW === 'week'){
+    const start = calStartOfWeek(CAL_CURRENT_DATE);
+    const end = calEndOfWeek(CAL_CURRENT_DATE);
+    const label = CAL_MONTHS_SHORT[start.getMonth()] + ' ' + start.getDate() +
+      ' – ' + CAL_MONTHS_SHORT[end.getMonth()] + ' ' + end.getDate() +
+      ' ' + end.getFullYear();
+    titleEl.textContent = label;
+    return;
+  }
+  if(CAL_CURRENT_VIEW === 'day'){
+    const d = CAL_CURRENT_DATE;
+    titleEl.textContent = d.getDate() + ' ' + CAL_MONTHS_SHORT[d.getMonth()] + ' ' + d.getFullYear();
+    return;
+  }
+  const d = CAL_CURRENT_DATE;
+  titleEl.textContent = d.toLocaleDateString('es-CO', { month:'long', year:'numeric' }).toUpperCase();
+}
+function calEventsOnDay(isoDMY){
+  return CAL_EVENTS.filter(ev => ev.fechaEvento === isoDMY);
+}
+function calRender(){
+  const cont = document.getElementById('cal-container');
+  if(!cont) return;
+  const filterVal = document.getElementById('cal-filter-input')?.value.trim().toLowerCase() || '';
+  cont.innerHTML = '';
+  calUpdateTitle();
+
+  if(CAL_CURRENT_VIEW === 'month') calRenderMonth(cont, filterVal);
+  else if(CAL_CURRENT_VIEW === 'week') calRenderWeek(cont, filterVal);
+  else if(CAL_CURRENT_VIEW === 'day') calRenderDay(cont, filterVal);
+  else if(CAL_CURRENT_VIEW === 'year') calRenderYear(cont, filterVal);
+}
+
+function calRenderMonth(cont, filterVal){
+  const header = document.createElement('div');
+  header.className = 'cal-weekdays';
+  CAL_WEEKDAYS_SHORT.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-weekday';
+    el.textContent = d;
+    header.appendChild(el);
+  });
+  cont.appendChild(header);
+
+  const grid = document.createElement('div');
+  grid.className = 'cal-month-grid';
+
+  const year = CAL_CURRENT_DATE.getFullYear();
+  const month = CAL_CURRENT_DATE.getMonth();
+  const firstDay = new Date(year,month,1);
+  const startWeekDay = firstDay.getDay();
+  const daysInMonth = new Date(year,month+1,0).getDate();
+
+  const prevMonthDays = (startWeekDay + 7 - 0) % 7;
+  const totalCells = prevMonthDays + daysInMonth;
+  const cells = totalCells <= 35 ? 35 : 42;
+
+  const todayDMY = calFormatDMY(new Date());
+
+  for(let i=0; i<cells; i++){
+    const cell = document.createElement('div');
+    cell.className = 'cal-day-cell';
+    const dayOffset = i - prevMonthDays + 1;
+    let cellDate;
+    let inThisMonth = true;
+
+    if(dayOffset < 1){ cellDate = new Date(year, month, dayOffset); inThisMonth = false; }
+    else if(dayOffset > daysInMonth){ cellDate = new Date(year, month, dayOffset); inThisMonth = false; }
+    else { cellDate = new Date(year, month, dayOffset); }
+
+    const iso = calFormatDMY(cellDate);
+    if(!inThisMonth) cell.classList.add('other-month');
+
+    const headerNum = document.createElement('div');
+    headerNum.className = 'cal-day-number';
+    if(iso === todayDMY){
+      headerNum.classList.add('today');
+      headerNum.textContent = cellDate.getDate();
+    }else{
+      headerNum.textContent = cellDate.getDate();
+    }
+    cell.appendChild(headerNum);
+
+    const events = calEventsOnDay(iso).filter(ev => calEventMatchesFilter(ev, filterVal));
+    events.sort((a,b)=>{
+      const ma = calMinutesFromTimeStr(a.horaInicio24 || '');
+      const mb = calMinutesFromTimeStr(b.horaInicio24 || '');
+      return ma - mb;
+    });
+
+    events.forEach(ev => {
+      const chip = document.createElement('div');
+      chip.className = calStatusColorClass(ev.estado, ev.secretaria);
+      chip.classList.add('cal-event-chip');
+
+      const title = document.createElement('span');
+      title.className = 'cal-evt-title';
+      title.textContent = ev.nombreEvento || '';
+
+      const time = document.createElement('span');
+      time.className = 'cal-evt-time';
+      time.textContent = (ev.horaInicioAMPM || '') + ' - ' + (ev.horaTerminacionAMPM || '');
+
+      chip.appendChild(title);
+      chip.appendChild(time);
+
+      chip.addEventListener('click', ()=> calOpenEventForEdit(ev.codigo));
+      cell.appendChild(chip);
+    });
+
+    grid.appendChild(cell);
+  }
+  cont.appendChild(grid);
+}
+
+function calRenderDay(cont, filterVal){
+  const header = document.createElement('div');
+  header.className = 'cal-day-header-row';
+  const d = CAL_CURRENT_DATE;
+  header.textContent = d.toLocaleDateString('es-CO',{ weekday:'long', day:'numeric', month:'long', year:'numeric' }).toUpperCase();
+  cont.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'cal-day-body';
+
+  const iso = calFormatDMY(d);
+  const events = calEventsOnDay(iso).filter(ev => calEventMatchesFilter(ev, filterVal));
+  events.sort((a,b)=>{
+    const ma = calMinutesFromTimeStr(a.horaInicio24 || '');
+    const mb = calMinutesFromTimeStr(b.horaInicio24 || '');
+    return ma - mb;
+  });
+
+  if(!events.length){
+    const p = document.createElement('p');
+    p.className = 'muted';
+    p.textContent = 'Sin eventos para este día.';
+    body.appendChild(p);
+  }else{
+    events.forEach(ev => {
+      const chip = document.createElement('div');
+      chip.className = calStatusColorClass(ev.estado, ev.secretaria);
+      chip.classList.add('cal-event-chip');
+
+      const title = document.createElement('span');
+      title.className = 'cal-evt-title';
+      title.textContent = ev.nombreEvento || '';
+
+      const time = document.createElement('span');
+      time.className = 'cal-evt-time';
+      time.textContent = (ev.horaInicioAMPM || '') + ' - ' + (ev.horaTerminacionAMPM || '');
+
+      const desc = document.createElement('div');
+      desc.style.fontSize = '.72rem';
+      desc.textContent = ev.nombreEvento || '';
+
+      chip.appendChild(title);
+      chip.appendChild(time);
+      chip.appendChild(desc);
+
+      chip.addEventListener('click', ()=> calOpenEventForEdit(ev.codigo));
+      body.appendChild(chip);
+    });
+  }
+  cont.appendChild(body);
+}
+
+function calRenderWeek(cont, filterVal){
+  const start = calStartOfWeek(CAL_CURRENT_DATE);
+  const end = calEndOfWeek(CAL_CURRENT_DATE);
+
+  const header = document.createElement('div');
+  header.className = 'cal-week-header-row';
+  header.textContent = 'Semana del ' +
+    start.getDate() + ' ' + CAL_MONTHS_SHORT[start.getMonth()] +
+    ' al ' +
+    end.getDate() + ' ' + CAL_MONTHS_SHORT[end.getMonth()] +
+    ' ' + end.getFullYear();
+  cont.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'cal-week-body';
+
+  for(let i=0;i<7;i++){
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const iso = calFormatDMY(d);
+
+    const row = document.createElement('div');
+    row.style.borderRadius = '10px';
+    row.style.padding = '6px 8px';
+    row.style.background = '#f9fafb';
+    row.style.marginBottom = '6px';
+
+    const head = document.createElement('div');
+    head.style.display = 'flex';
+    head.style.alignItems = 'center';
+    head.style.justifyContent = 'space-between';
+
+    const left = document.createElement('span');
+    left.style.fontWeight = '700';
+    left.style.fontSize = '.8rem';
+    left.textContent = CAL_WEEKDAYS_SHORT[d.getDay()] + ' ' + d.getDate() + ' ' + CAL_MONTHS_SHORT[d.getMonth()];
+
+    head.appendChild(left);
+    row.appendChild(head);
+
+    const evs = calEventsOnDay(iso).filter(ev => calEventMatchesFilter(ev, filterVal));
+    evs.sort((a,b)=>{
+      const ma = calMinutesFromTimeStr(a.horaInicio24 || '');
+      const mb = calMinutesFromTimeStr(b.horaInicio24 || '');
+      return ma - mb;
+    });
+
+    if(!evs.length){
+      const p = document.createElement('p');
+      p.className = 'muted';
+      p.style.fontSize = '.72rem';
+      p.textContent = 'Sin eventos';
+      row.appendChild(p);
+    }else{
+      evs.forEach(ev => {
+        const chip = document.createElement('div');
+        chip.className = calStatusColorClass(ev.estado, ev.secretaria);
+        chip.classList.add('cal-event-chip');
+
+        const title = document.createElement('span');
+        title.className = 'cal-evt-title';
+        title.textContent = ev.secretaria || '';
+
+        const time = document.createElement('span');
+        time.className = 'cal-evt-time';
+        time.textContent = (ev.horaInicioAMPM || '') + ' - ' + (ev.horaTerminacionAMPM || '');
+
+        chip.appendChild(title);
+        chip.appendChild(time);
+        chip.addEventListener('click', ()=> calOpenEventForEdit(ev.codigo));
+        row.appendChild(chip);
+      });
+    }
+
+    body.appendChild(row);
+  }
+
+  cont.appendChild(body);
+}
+
+function calRenderYear(cont, filterVal){
+  const grid = document.createElement('div');
+  grid.className = 'cal-year-grid';
+
+  const year = CAL_CURRENT_DATE.getFullYear();
+  const eventsByMonth = {};
+  CAL_EVENTS.forEach(ev => {
+    const d = calParseDMY(ev.fechaEvento);
+    if(!d || d.getFullYear() !== year) return;
+    const m = d.getMonth();
+    if(!eventsByMonth[m]) eventsByMonth[m] = [];
+    if(calEventMatchesFilter(ev, filterVal)){
+      eventsByMonth[m].push(ev);
+    }
+  });
+
+  for(let m=0;m<12;m++){
+    const box = document.createElement('div');
+    box.className = 'cal-year-month';
+
+    const h4 = document.createElement('h4');
+    h4.textContent = new Date(year,m,1).toLocaleDateString('es-CO',{ month:'long' }).toUpperCase();
+    box.appendChild(h4);
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const trh = document.createElement('tr');
+    CAL_WEEKDAYS_SHORT.forEach(d => {
+      const th = document.createElement('th');
+      th.textContent = d.charAt(0);
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    const first = new Date(year,m,1);
+    const startDay = first.getDay();
+    const daysInMonth = new Date(year,m+1,0).getDate();
+
+    let day = 1;
+    let done = false;
+    while(!done){
+      const tr = document.createElement('tr');
+      for(let wd=0; wd<7; wd++){
+        const td = document.createElement('td');
+        if(wd < startDay && day === 1){
+          td.textContent = '';
+        }else if(day > daysInMonth){
+          td.textContent = '';
+          done = true;
+        }else{
+          td.textContent = day;
+          const dmy = calFormatDMY(new Date(year,m,day));
+          const hasEvent = (eventsByMonth[m]||[]).some(ev => ev.fechaEvento === dmy);
+          if(hasEvent){
+            const dot = document.createElement('span');
+            dot.className = 'cal-year-dot';
+            td.appendChild(dot);
+          }
+          day++;
+        }
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+
+    table.appendChild(tbody);
+    box.appendChild(table);
+    grid.appendChild(box);
+  }
+
+  cont.appendChild(grid);
+}
+
+function calSyncViewButtons(){
+  ['cal-view-day','cal-view-week','cal-view-month','cal-view-year'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.classList.remove('active');
+  });
+  if(CAL_CURRENT_VIEW === 'day') document.getElementById('cal-view-day')?.classList.add('active');
+  if(CAL_CURRENT_VIEW === 'week') document.getElementById('cal-view-week')?.classList.add('active');
+  if(CAL_CURRENT_VIEW === 'month') document.getElementById('cal-view-month')?.classList.add('active');
+  if(CAL_CURRENT_VIEW === 'year') document.getElementById('cal-view-year')?.classList.add('active');
+}
+
+document.getElementById('go-calendario')?.addEventListener('click', async ()=>{
+  overlay.classList.remove('open');
+  await calLoadEvents();
+  CAL_CURRENT_VIEW = 'month';
+  CAL_CURRENT_DATE = new Date();
+  calSyncViewButtons();
+  showView('view-calendario');
+  calRender();
+});
+
+document.getElementById('cal-btn-back')?.addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.back);
+  showView('view-inicio');
+});
+document.getElementById('cal-btn-today')?.addEventListener('click', ()=>{
+  CAL_CURRENT_DATE = new Date();
+  calRender();
+});
+document.getElementById('cal-prev')?.addEventListener('click', ()=>{
+  if(CAL_CURRENT_VIEW === 'year') CAL_CURRENT_DATE.setFullYear(CAL_CURRENT_DATE.getFullYear()-1);
+  else if(CAL_CURRENT_VIEW === 'month') CAL_CURRENT_DATE.setMonth(CAL_CURRENT_DATE.getMonth()-1);
+  else if(CAL_CURRENT_VIEW === 'week') CAL_CURRENT_DATE.setDate(CAL_CURRENT_DATE.getDate()-7);
+  else if(CAL_CURRENT_VIEW === 'day') CAL_CURRENT_DATE.setDate(CAL_CURRENT_DATE.getDate()-1);
+  calRender();
+});
+document.getElementById('cal-next')?.addEventListener('click', ()=>{
+  if(CAL_CURRENT_VIEW === 'year') CAL_CURRENT_DATE.setFullYear(CAL_CURRENT_DATE.getFullYear()+1);
+  else if(CAL_CURRENT_VIEW === 'month') CAL_CURRENT_DATE.setMonth(CAL_CURRENT_DATE.getMonth()+1);
+  else if(CAL_CURRENT_VIEW === 'week') CAL_CURRENT_DATE.setDate(CAL_CURRENT_DATE.getDate()+7);
+  else if(CAL_CURRENT_VIEW === 'day') CAL_CURRENT_DATE.setDate(CAL_CURRENT_DATE.getDate()+1);
+  calRender();
+});
+
+document.getElementById('cal-view-day')?.addEventListener('click', ()=>{ CAL_CURRENT_VIEW = 'day'; calSyncViewButtons(); calRender(); });
+document.getElementById('cal-view-week')?.addEventListener('click', ()=>{ CAL_CURRENT_VIEW = 'week'; calSyncViewButtons(); calRender(); });
+document.getElementById('cal-view-month')?.addEventListener('click', ()=>{ CAL_CURRENT_VIEW = 'month'; calSyncViewButtons(); calRender(); });
+document.getElementById('cal-view-year')?.addEventListener('click', ()=>{ CAL_CURRENT_VIEW = 'year'; calSyncViewButtons(); calRender(); });
+
+document.getElementById('cal-filter-toggle')?.addEventListener('click', ()=>{
+  const input = document.getElementById('cal-filter-input');
+  if(!input) return;
+  const visible = input.style.display !== 'none';
+  if(visible){
+    input.style.display = 'none';
+    input.value = '';
+    calRender();
+  }else{
+    input.style.display = '';
+    input.focus();
+  }
+});
+document.getElementById('cal-filter-input')?.addEventListener('input', ()=> calRender());
+
+async function calLoadEvents(){
+  try{
+    const list = await apiGet(CAL_API_ACTION_LIST, {});
+    CAL_EVENTS = Array.isArray(list) ? list.map(ev => calNormalizeEvent(ev)) : [];
+    console.log('CAL_EVENTS normalized:', CAL_EVENTS);
+  }catch(e){
+    CAL_EVENTS = [];
+    Swal.fire({icon:'error',title:'Error cargando calendario',text:String(e.message||e)});
+  }
+}
+function calNormalizeEvent(ev){
+  const out = Object.assign({}, ev||{});
+  out.codigo = String(out.codigo||'');
+  out.fechaEvento = String(out.fechaEvento||'');
+  out.nombreEvento = String(out.nombreEvento||'');
+  out.secretaria = String(out.secretaria||'');
+  out.estado = String(out.estado||'').toUpperCase() || 'PROGRAMADO';
+  out.horaInicioAMPM = String(out.horaInicio||'');
+  out.horaTerminacionAMPM = String(out.horaTerminacion||'');
+  const hi = calHMFromAmPm(out.horaInicioAMPM);
+  const hf = calHMFromAmPm(out.horaTerminacionAMPM);
+  out.horaInicio24 = calPad2(hi.h) + ':' + calPad2(hi.m);
+  out.horaTerminacion24 = calPad2(hf.h) + ':' + calPad2(hf.m);
+  return out;
+}
+
+/* Formulario Registrar / Editar evento */
+document.getElementById('cal-btn-new')?.addEventListener('click', ()=>{
+  CAL_SELECTED_EVENT = null;
+  calResetEventoForm();
+  document.getElementById('evento-title').textContent = 'REGISTRAR EVENTO';
+  showView('view-evento');
+});
+document.getElementById('evento-volver')?.addEventListener('click', ()=>{
+  playSoundOnce(SOUNDS.back);
+  showView('view-calendario');
+});
+
+function calResetEventoForm(){
+  document.getElementById('evento-codigo').value = '';
+  document.getElementById('nombreEvento').value = '';
+  document.getElementById('fechaEvento').value = '';
+  document.getElementById('horaInicio').value = '';
+  document.getElementById('horaTerminacion').value = '';
+  document.getElementById('secretaria').value = '';
+  document.getElementById('otros').value = '';
+  document.getElementById('lugar').value = '';
+  document.getElementById('detalles').value = '';
+  document.getElementById('publicacion').value = '';
+  document.getElementById('nombre').value = '';
+  document.getElementById('contacto').value = '';
+  document.getElementById('cargo').value = '';
+  const checks = document.querySelectorAll('#requerimientos input[type="checkbox"]');
+  checks.forEach(ch => ch.checked = false);
+}
+
+function calFillEventoForm(ev){
+  function ensureDMY(v){
+    if (!v) return '';
+    if (Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v.getTime())){
+      const dd = String(v.getDate()).padStart(2,'0');
+      const mm = String(v.getMonth()+1).padStart(2,'0');
+      const yy = v.getFullYear();
+      return dd + '/' + mm + '/' + yy;
+    }
+    const s = String(v);
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(s.trim())) return s.trim();
+    const d = new Date(s);
+    if (!isNaN(d.getTime())){
+      const dd = String(d.getDate()).padStart(2,'0');
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const yy = d.getFullYear();
+      return dd + '/' + mm + '/' + yy;
+    }
+    return s;
+  }
+
+  document.getElementById('evento-codigo').value = ev.codigo || '';
+  document.getElementById('nombreEvento').value = ev.nombreEvento || '';
+  document.getElementById('fechaEvento').value = ensureDMY(ev.fechaEvento || '');
+  document.getElementById('horaInicio').value = ev.horaInicio24 || '';
+  document.getElementById('horaTerminacion').value = ev.horaTerminacion24 || '';
+  document.getElementById('secretaria').value = ev.secretaria || '';
+  document.getElementById('otros').value = ev.otros || '';
+  document.getElementById('lugar').value = ev.lugar || '';
+  document.getElementById('detalles').value = ev.detalles || '';
+  document.getElementById('publicacion').value = ensureDMY(ev.publicacion || '');
+  document.getElementById('nombre').value = ev.nombre || '';
+  document.getElementById('contacto').value = ev.contacto || '';
+  document.getElementById('cargo').value = ev.cargo || '';
+
+  const checks = document.querySelectorAll('#requerimientos input[type="checkbox"]');
+  checks.forEach(ch => {
+    const labelVal = ch.value;
+    const src = String(ev.requerimientos||'');
+    ch.checked = src.indexOf(labelVal) !== -1;
+  });
+}
+
+async function calOpenEventForEdit(codigo){
+  try{
+    const data = await apiGet(CAL_API_ACTION_GET, { codigo });
+    if(!data){
+      Swal.fire({icon:'info',title:'Evento no encontrado'});
+      return;
+    }
+    const ev = calNormalizeEvent(data);
+    CAL_SELECTED_EVENT = ev;
+    calFillEventoForm(ev);
+    document.getElementById('evento-title').textContent = 'EDITAR EVENTO';
+    showView('view-evento');
+  }catch(e){
+    Swal.fire({icon:'error',title:'Error',text:String(e.message||e)});
+  }
+}
+
+/* Picker fechas formulario */
+function calInitSimplePicker(dSelId,mSelId,aSelId){
+  const dSel = document.getElementById(dSelId);
+  const mSel = document.getElementById(mSelId);
+  const aSel = document.getElementById(aSelId);
+  if(dSel && !dSel.childElementCount){
+    for(let d=1; d<=31; d++){
+      const opt = document.createElement('option');
+      opt.value = calPad2(d);
+      opt.textContent = opt.value;
+      dSel.appendChild(opt);
+    }
+  }
+  if(mSel && !mSel.childElementCount){
+    const mesesNombres=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    for(let i=0;i<12;i++){
+      const opt = document.createElement('option');
+      opt.value = calPad2(i+1);
+      opt.textContent = mesesNombres[i];
+      mSel.appendChild(opt);
+    }
+  }
+  if(aSel && !aSel.childElementCount){
+    const fixedYear = 2026;
+    const opt = document.createElement('option');
+    opt.value = String(fixedYear);
+    opt.textContent = String(fixedYear);
+    opt.selected = true;
+    aSel.appendChild(opt);
+  }
+}
+calInitSimplePicker('evtDia','evtMes','evtAnio');
+calInitSimplePicker('pubDia','pubMes','pubAnio');
+
+document.getElementById('fechaEvento')?.addEventListener('click', ()=>{
+  const m = document.getElementById('eventoFechaModal');
+  if(m){ m.style.display = 'flex'; m.setAttribute('aria-hidden','false'); }
+});
+document.getElementById('evtFechaCancelar')?.addEventListener('click', ()=>{
+  const m = document.getElementById('eventoFechaModal');
+  if(m){ m.style.display = 'none'; m.setAttribute('aria-hidden','true'); }
+});
+document.getElementById('evtFechaOk')?.addEventListener('click', ()=>{
+  const d = document.getElementById('evtDia')?.value || '01';
+  const m = document.getElementById('evtMes')?.value || '01';
+  const y = document.getElementById('evtAnio')?.value || String(new Date().getFullYear());
+  document.getElementById('fechaEvento').value = d + '/' + m + '/' + y;
+  const modal = document.getElementById('eventoFechaModal');
+  if(modal){ modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); }
+});
+
+document.getElementById('publicacion')?.addEventListener('click', ()=>{
+  const m = document.getElementById('publicacionFechaModal');
+  if(m){ m.style.display = 'flex'; m.setAttribute('aria-hidden','false'); }
+});
+document.getElementById('pubFechaCancelar')?.addEventListener('click', ()=>{
+  const m = document.getElementById('publicacionFechaModal');
+  if(m){ m.style.display = 'none'; m.setAttribute('aria-hidden','true'); }
+});
+document.getElementById('pubFechaOk')?.addEventListener('click', ()=>{
+  const d = document.getElementById('pubDia')?.value || '01';
+  const m = document.getElementById('pubMes')?.value || '01';
+  const y = document.getElementById('pubAnio')?.value || String(new Date().getFullYear());
+  document.getElementById('publicacion').value = d + '/' + m + '/' + y;
+  const modal = document.getElementById('publicacionFechaModal');
+  if(modal){ modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); }
+});
+
+/* Autocomplete Responsable (usa backend getResponsablesCalendario) */
+function bindResponsablesQuery(){
+  const input = document.getElementById('nombre');
+  const list  = document.getElementById('dl-responsables');
+  const contactoInput = document.getElementById('contacto');
+  if(!input || !list || !contactoInput) return;
+
+  let t = null;
+
+  input.addEventListener('input', ()=>{
+    const q = input.value.trim();
+    contactoInput.value = '';
+
+    if(t) clearTimeout(t);
+    if(!q){ list.innerHTML = ''; return; }
+
+    t = setTimeout(async ()=>{
+      try{
+        const url = new URL(API_BASE);
+        url.search = new URLSearchParams({ action: 'getResponsablesCalendario', query: q }).toString();
+        const r = await fetch(url.toString(), { method:'GET' });
+        const j = await r.json();
+        const data = (j && j.ok && Array.isArray(j.data)) ? j.data : [];
+
+        list.innerHTML = '';
+        data.forEach(item=>{
+          const opt = document.createElement('option');
+          opt.value = item.nombre;
+          opt.setAttribute('data-contacto', item.contacto || '');
+          list.appendChild(opt);
+        });
+
+        rellenarContactoDesdeDatalist(input.value, list, contactoInput);
+      }catch(_){}
+    }, 200);
+  });
+
+  input.addEventListener('change', ()=>{
+    rellenarContactoDesdeDatalist(input.value, list, contactoInput);
+  });
+}
+function rellenarContactoDesdeDatalist(valor, list, contactoInput){
+  const val = String(valor || '').trim();
+  if(!val) return;
+
+  const opt = Array.from(list.querySelectorAll('option')).find(o => o.value === val);
+  if(!opt) return;
+
+  const telRaw = opt.getAttribute('data-contacto') || '';
+  const tel    = telRaw.replace(/\D/g, '');
+  contactoInput.value = tel;
+}
+bindResponsablesQuery();
+
+/* Guardar evento */
+document.getElementById('evento-guardar')?.addEventListener('click', async ()=>{
+  const codigo = document.getElementById('evento-codigo').value.trim();
+  const nombreEvento = document.getElementById('nombreEvento').value.trim();
+  const fechaEvento = document.getElementById('fechaEvento').value.trim();
+  const horaInicio = document.getElementById('horaInicio').value.trim();
+  const horaTerminacion = document.getElementById('horaTerminacion').value.trim();
+  const secretaria = document.getElementById('secretaria').value;
+  const otros = document.getElementById('otros').value.trim();
+  const lugar = document.getElementById('lugar').value.trim();
+  const detalles = document.getElementById('detalles').value.trim();
+  const publicacion = document.getElementById('publicacion').value.trim();
+  const responsable = document.getElementById('nombre').value.trim();
+  const contacto = document.getElementById('contacto').value.trim();
+  const cargo = document.getElementById('cargo').value.trim();
+
+  if(!nombreEvento || !fechaEvento || !horaInicio || !horaTerminacion || !secretaria){
+    Swal.fire({icon:'warning',title:'Campos requeridos',text:'Nombre, fecha, horas y secretaría son obligatorios.'});
+    return;
+  }
+
+  const checks = document.querySelectorAll('#requerimientos input[type="checkbox"]');
+  const reqs = [];
+  checks.forEach(ch => { if(ch.checked) reqs.push(ch.value); });
+  const requerimientosStr = reqs.join(', ');
+
+  const allFilled = Boolean(
+    nombreEvento &&
+    fechaEvento &&
+    horaInicio &&
+    horaTerminacion &&
+    secretaria &&
+    detalles &&
+    requerimientosStr &&
+    otros &&
+    lugar &&
+    publicacion &&
+    responsable &&
+    contacto &&
+    cargo
+  );
+  const estado = allFilled ? 'COMPLETADO' : 'PROGRAMADO';
+
+  const body = {
+    codigo,
+    nombreEvento,
+    fechaEvento,
+    horaInicio,
+    horaTerminacion,
+    detalles,
+    requerimientos: requerimientosStr,
+    otros,
+    lugar,
+    publicacion,
+    nombre: responsable,
+    contacto,
+    secretaria,
+    cargo,
+    estado
+  };
+
+  try{
+    const res = await apiPost(CAL_API_ACTION_SAVE, body);
+    if(!res || !res.success){
+      Swal.fire({icon:'error',title:'Error al guardar',text:res && res.message ? res.message : 'Intenta nuevamente.'});
+      return;
+    }
+    await calLoadEvents();
+    Swal.fire({icon:'success',title:'Evento guardado',timer:1800,showConfirmButton:false});
+    showView('view-calendario');
+    calRender();
+  }catch(e){
+    Swal.fire({icon:'error',title:'Error',text:String(e.message||e)});
+  }
+});
+
+/* Botón WhatsApp en formulario de Evento (usa el campo "contacto") */
+function normalizeNumber57(raw){
+  let num = String(raw || '').replace(/\D/g,'');
+  if(!num) return '';
+  if(num.length === 10 && !num.startsWith('57')) num = '57' + num;
+  if(!(num.length === 12 && num.startsWith('57'))) return '';
+  return num;
+}
+(function bindEventoWhatsappButton(){
+  const btn = document.getElementById('contacto-wa-btn');
+  const contactoInput = document.getElementById('contacto');
+  if(!btn || !contactoInput) return;
+
+  btn.addEventListener('click', ()=>{
+    const raw = contactoInput.value || '';
+    const tel = normalizeNumber57(raw);
+    if(!tel){
+      Swal.fire({icon:'info',title:'Sin teléfono válido',text:'No hay un número de contacto válido para este evento.'});
+      return;
+    }
+    window.open('https://wa.me/' + tel,'_blank');
+  });
+})();
+
+/* ================== FIN ================== */
+</script>
+</body>
+</html>
