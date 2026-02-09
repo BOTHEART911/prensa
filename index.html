@@ -1321,13 +1321,36 @@ function buildClipboardText(item){
     'LÍNEA: ' + (tel || '-')
   );
 }
-  
-const html =
-  '<b>LUGAR:</b> ' + (item.lugar || item.nombre || '-') + '<br>' +
-  '<b>DIRECCIÓN:</b> ' + (item.direccion || '-') + '<br>' +
-  '<b>CORREO:</b> ' + (item.correo || '-') + '<br>' +
-  '<b>WHATSAPP:</b> ' + (item.whatsapp || '-') + '<br>' +
-  '<b>LÍNEA:</b> ' + (item.linea || '-');
+
+  if(result.isConfirmed){
+    const text = buildClipboardText(item);
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+      }
+      await Swal.fire({ icon:'success', title:'Información Copiada', timer:2000, showConfirmButton:false });
+    }catch(e){
+      await Swal.fire({ icon:'error', title:'No se pudo copiar', text:String(e.message||e) });
+    }
+    return;
+  }
+
+  if(result.isDenied){
+    const shareText = buildShareText(item);
+    const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent || '');
+    const enc = encodeURIComponent(shareText);
+    const url = esMovil ? 'whatsapp://send?text=' + enc : 'https://api.whatsapp.com/send?text=' + enc;
+    window.open(url,'_blank');
+  }
+}
+
+  async function showDirectorioShareDialog(item){
+  const html =
+    '<b>LUGAR:</b> ' + (item.lugar || item.nombre || '-') + '<br>' +
+    '<b>DIRECCIÓN:</b> ' + (item.direccion || '-') + '<br>' +
+    '<b>CORREO:</b> ' + (item.correo || '-') + '<br>' +
+    '<b>WHATSAPP:</b> ' + (item.whatsapp || '-') + '<br>' +
+    '<b>LÍNEA:</b> ' + (item.linea || '-');
 
   const result = await Swal.fire({
     icon:'success',
