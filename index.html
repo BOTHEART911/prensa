@@ -692,6 +692,14 @@
       width: 100%;
     }
   }
+
+    .cal-evt-assigned{
+  display:block;
+  font-weight:600;
+  font-size:clamp(.28rem, 0.65vw, .54rem);
+  line-height:1.05;
+  opacity:.9;
+}
   </style>
 </head>
 <body>
@@ -2964,8 +2972,8 @@ function briefRenderMonth(cont, filterVal){
       chip.classList.add('cal-event-chip');
 
       const title = document.createElement('span');
-      title.className = 'cal-evt-title';
-      title.textContent = (it.nombs || '') + (String(it.asignado||'').trim() ? (' - ' + String(it.asignado).trim()) : '');
+      title.className = 'cal-evt-title cal-evt-assigned';
+      title.textContent = String(it.asignado || '').trim();
 
       const time = document.createElement('span');
       time.className = 'cal-evt-time';
@@ -3016,8 +3024,8 @@ function briefRenderDay(cont, filterVal){
       chip.classList.add('cal-event-chip');
 
       const title = document.createElement('span');
-      title.className = 'cal-evt-title';
-      title.textContent = (it.nombs || '') + (String(it.asignado||'').trim() ? (' - ' + String(it.asignado).trim()) : '');
+      title.className = 'cal-evt-title cal-evt-assigned';
+      title.textContent = String(it.asignado || '').trim();
 
       const time = document.createElement('span');
       time.className = 'cal-evt-time';
@@ -3095,8 +3103,8 @@ function briefRenderWeek(cont, filterVal){
         chip.classList.add('cal-event-chip');
 
         const title = document.createElement('span');
-        title.className = 'cal-evt-title';
-        title.textContent = (it.nombs || '') + (String(it.asignado||'').trim() ? (' - ' + String(it.asignado).trim()) : '');
+        title.className = 'cal-evt-title cal-evt-assigned';
+        title.textContent = String(it.asignado || '').trim();
 
         const time = document.createElement('span');
         time.className = 'cal-evt-time';
@@ -3330,12 +3338,15 @@ function briefResetDetail(){
   const checks = document.querySelectorAll('#requerimients input[type="checkbox"]');
   checks.forEach(ch => ch.checked = false);
 
-  if(window.__choicesAsignado){
-    window.__choicesAsignado.destroy();
-    window.__choicesAsignado = null;
-  }
-  document.getElementById('asignadoSelect').innerHTML = '';
-}
+if(window.__choicesAsignado){
+      const selectedVals = String(d.asignado || '')
+        .split(',')
+        .map(s=>s.trim())
+        .filter(Boolean)
+        .map(s=>s.toUpperCase());
+
+      window.__choicesAsignado.setChoiceByValue(selectedVals);
+    }
 
 function briefReqChecksFromText(text){
   const src = String(text||'');
