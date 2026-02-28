@@ -2965,7 +2965,7 @@ function briefRenderMonth(cont, filterVal){
 
       const title = document.createElement('span');
       title.className = 'cal-evt-title';
-      title.textContent = it.nombs || '';
+      title.textContent = (it.nombs || '') + (String(it.asignado||'').trim() ? (' - ' + String(it.asignado).trim()) : '');
 
       const time = document.createElement('span');
       time.className = 'cal-evt-time';
@@ -3017,7 +3017,7 @@ function briefRenderDay(cont, filterVal){
 
       const title = document.createElement('span');
       title.className = 'cal-evt-title';
-      title.textContent = it.nombs || '';
+      title.textContent = (it.nombs || '') + (String(it.asignado||'').trim() ? (' - ' + String(it.asignado).trim()) : '');
 
       const time = document.createElement('span');
       time.className = 'cal-evt-time';
@@ -3096,7 +3096,7 @@ function briefRenderWeek(cont, filterVal){
 
         const title = document.createElement('span');
         title.className = 'cal-evt-title';
-        title.textContent = it.nombs || '';
+        title.textContent = (it.nombs || '') + (String(it.asignado||'').trim() ? (' - ' + String(it.asignado).trim()) : '');
 
         const time = document.createElement('span');
         time.className = 'cal-evt-time';
@@ -3363,7 +3363,7 @@ function toAmPmFromHHmm(hhmm){
   let h12 = h % 12;
   if(h12 === 0) h12 = 12;
 
-  return h12 + ':' + m + ' ' + suf;
+  return String(h12).padStart(2,'0') + ':' + m + ' ' + suf;
 }
 
 function briefToHHmm(amPm){
@@ -3445,7 +3445,7 @@ function briefFillDetail(d){
   document.getElementById('nombreEvents').value = d.nombreEvents || '';
   document.getElementById('fechaEvents').value = d.fechaEvents || '';
 
-  document.getElementById('horaIs').value = briefToHHmm(d.horaIs || '');
+ document.getElementById('horaIs').value = briefToHHmm(d.horaIs || '');
   document.getElementById('horaFs').value = briefToHHmm(d.horaFs || '');
 
   document.getElementById('detalls').value = d.detalls || '';
@@ -3491,6 +3491,10 @@ function briefFillDetail(d){
       });
     }
   }
+
+   if(window.__choicesAsignado){
+      window.__choicesAsignado.setChoiceByValue(selected);
+    }
 
   if(asignadoWrap){
     if(userCanEditAssignedField()){
@@ -3575,8 +3579,8 @@ document.getElementById('brief-save')?.addEventListener('click', async ()=>{
     body.fechaIngreso = document.getElementById('fechaIngreso').value.trim();
     body.nombreEvents = document.getElementById('nombreEvents').value.trim();
     body.fechaEvents = document.getElementById('fechaEvents').value.trim();
-    body.horaIs = document.getElementById('horaIs').value.trim();
-    body.horaFs = document.getElementById('horaFs').value.trim();
+     body.horaIs = toAmPmFromHHmm(document.getElementById('horaIs').value.trim());
+    body.horaFs = toAmPmFromHHmm(document.getElementById('horaFs').value.trim());
     body.detalls = document.getElementById('detalls').value.trim();
     body.requerimients = briefReqTextFromChecks();
     body.otrs = document.getElementById('otrs').value.trim();
