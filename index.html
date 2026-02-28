@@ -3503,20 +3503,15 @@ function briefFillDetail(d){
     }
   }
 
-   if(window.__choicesAsignado){
-      window.__choicesAsignado.setChoiceByValue(selected);
-    }
+if(window.__choicesAsignado){
+      const selectedVals = String(d.asignado || '')
+        .split(',')
+        .map(s=>s.trim())
+        .filter(Boolean)
+        .map(s=>s.toUpperCase());
 
-  if(asignadoWrap){
-    if(userCanEditAssignedField()){
-      asignadoWrap.classList.remove('hidden');
-    }else{
-      asignadoWrap.classList.add('hidden');
+      window.__choicesAsignado.setChoiceByValue(selectedVals);
     }
-  }
-
-  setBriefDetailEditMode();
-}
 
 async function briefOpenDetail(briefId, returnEstado){
   document.getElementById('brief-detail-title').textContent = 'REVISAR SOLICITUD';
