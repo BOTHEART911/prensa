@@ -3484,14 +3484,20 @@ function briefFillDetail(d){
       o.selected = selected.includes(String(o.value||'').toUpperCase());
     });
 
-    if(window.Choices){
-      window.__choicesAsignado = new Choices(asignadoSelect, {
-        removeItemButton: true,
-        shouldSort: false,
-        placeholder: true,
-        placeholderValue: 'Selecciona uno o varios'
-      });
-    }
+   // Si ya existe una instancia previa de Choices, destruirla antes de crear otra
+if (window.__choicesAsignado && typeof window.__choicesAsignado.destroy === 'function'){
+  try { window.__choicesAsignado.destroy(); } catch(e) {}
+  window.__choicesAsignado = null;
+}
+
+if(window.Choices){
+  window.__choicesAsignado = new Choices(asignadoSelect, {
+    removeItemButton: true,
+    shouldSort: false,
+    placeholder: true,
+    placeholderValue: 'Selecciona uno o varios'
+  });
+}
   }
 
  if(window.__choicesAsignado){
