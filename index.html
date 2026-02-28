@@ -3338,16 +3338,6 @@ function briefResetDetail(){
   const checks = document.querySelectorAll('#requerimients input[type="checkbox"]');
   checks.forEach(ch => ch.checked = false);
 
-if(window.__choicesAsignado){
-      const selectedVals = String(d.asignado || '')
-        .split(',')
-        .map(s=>s.trim())
-        .filter(Boolean)
-        .map(s=>s.toUpperCase());
-
-      window.__choicesAsignado.setChoiceByValue(selectedVals);
-    }
-
 function briefReqChecksFromText(text){
   const src = String(text||'');
   const checks = document.querySelectorAll('#requerimients input[type="checkbox"]');
