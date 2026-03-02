@@ -3519,6 +3519,13 @@ function buildBriefGroupMessage(){
 document.getElementById('brief-share-group')?.addEventListener('click', async ()=>{
   const msg = buildBriefGroupMessage();
   sendBuilderbotMessage(BRIEF_GROUP_ID, msg);
+
+  Swal.fire({
+    icon: 'success',
+    title: 'Detalles enviados',
+    timer: 2000,
+    showConfirmButton: false
+  });
 });
 
 function briefFillDetail(d){
