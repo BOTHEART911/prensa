@@ -701,20 +701,20 @@
   opacity:.9;
 }
 
-/* NUEVO: bloque visual del check "Enviar mensaje" */
+/* === NUEVO: checkbox "Enviar mensaje" (solo admins) === */
 .send-msg-wrap{
   display:flex;
   align-items:center;
   gap:10px;
-  padding:10px 12px;
+  padding:8px 10px;
   border-radius:12px;
+  background: rgba(255,255,255,.9);
   border:2px solid #ddd;
-  background:rgba(255,255,255,.85);
-  box-shadow:0 4px 10px rgba(0,0,0,.10);
 }
 .send-msg-wrap input[type="checkbox"]{
   width:18px;
   height:18px;
+  flex:0 0 auto;
 }
 .send-msg-wrap span{
   font-weight:800;
@@ -1028,11 +1028,11 @@
           <label for="asignadoSelect">Asignado (opcional)</label>
           <select id="asignadoSelect" multiple></select>
 
-          <!-- NUEVO: check "Enviar mensaje" solo visible para OSCAR/LAURA/IVAN -->
-          <div id="send-assign-msg-wrap" class="send-msg-wrap hidden" style="margin-top:10px;">
-            <input id="sendAssignMsg" type="checkbox">
+          <!-- NUEVO: checkbox Enviar mensaje (solo admins) -->
+          <label id="sendmsg-wrap" class="send-msg-wrap hidden" style="margin-top:10px;">
+            <input id="sendmsg-check" type="checkbox">
             <span>Enviar mensaje</span>
-          </div>
+          </label>
         </div>
       </div>
 
@@ -1270,21 +1270,11 @@
 <script>
 const API_BASE = 'https://script.google.com/macros/s/AKfycbzHH5u3VuZU0g3oef7qATHi1blNKsVZQu3PAHt2mfO8lsXTkQOQ6gLfNenkfOl9YHIsbw/exec';
 
-/* ================== BUILDERBOT (NUEVO) ================== */
+/* ================== NUEVO: BUILDERBOT (envío WhatsApp 1x1 y a grupo) ================== */
+/* Tomado como referencia de indexref.md, adaptado a esta app */
 const BUILDERBOT_ENDPOINT = 'https://app.builderbot.cloud/api/v2/ff37a123-12b0-4fdc-9866-f3e2daf389fb/messages';
 const BUILDERBOT_API_KEY  = 'bb-7f9ef630-5cfc-4ba4-9258-5e7cecbb4f65';
-
-function normalizeContratistaNumber(raw){
-  let num = String(raw || '').replace(/\D/g,'');
-  if(!num) return '';
-  if(num.length === 10 && !num.startsWith('57')){
-    num = '57' + num;
-  }
-  if(!(num.length === 12 && num.startsWith('57'))){
-    return '';
-  }
-  return num;
-}
+const BRIEF_GROUP_ID = 'IPI7t3SAtOhHuWpJuxw8Us';
 
 function sendBuilderbotMessage(destino, mensaje, mediaUrl){
   const numberField = String(destino || '').trim();
@@ -1295,7 +1285,7 @@ function sendBuilderbotMessage(destino, mensaje, mediaUrl){
 
   const payload = {
     messages: { content: mensaje },
-    number: numberField,
+    number: numberField,       // Puede ser número normalizado o ID de grupo
     checkIfExists: false
   };
 
@@ -1311,6 +1301,14 @@ function sendBuilderbotMessage(destino, mensaje, mediaUrl){
     },
     body: JSON.stringify(payload)
   }).catch(err => console.warn('Error enviando BuilderBot', err));
+}
+
+function normalizeWhatsApp57(raw){
+  let num = String(raw || '').replace(/\D/g,'');
+  if(!num) return '';
+  if(num.length === 10 && !num.startsWith('57')) num = '57' + num;
+  if(!(num.length === 12 && num.startsWith('57'))) return '';
+  return num;
 }
 
 function sleepMs(ms){
@@ -1513,11 +1511,6 @@ function userCanEditAssignedField(){
   return (n === 'OSCAR POLANIA' || n === 'LAURA ORTIZ');
 }
 
-/* NUEVO: los únicos que pueden ver el check "Enviar mensaje" son los 3 admins */
-function userCanSendAssignedMsg(){
-  return BRIEF_ADMINS.includes(normName(currentUser?.nombre || ''));
-}
-
 function setBriefDetailEditMode(){
   const canFullEdit = userIsBriefAdmin();
   const allowAssigned = userCanEditAssignedField();
@@ -1553,15 +1546,15 @@ function setBriefDetailEditMode(){
     }
   }
 
-  // NUEVO: control de visibilidad del check "Enviar mensaje"
-  const sendWrap = document.getElementById('send-assign-msg-wrap');
-  const sendChk = document.getElementById('sendAssignMsg');
-  if(sendWrap && sendChk){
-    if(userCanSendAssignedMsg() && allowAssigned){
+  /* NUEVO: checkbox Enviar mensaje visible SOLO a los 3 admins (OSCAR, LAURA, IVAN) */
+  const sendWrap = document.getElementById('sendmsg-wrap');
+  const sendCheck = document.getElementById('sendmsg-check');
+  if(sendWrap && sendCheck){
+    if(userIsBriefAdmin()){
       sendWrap.classList.remove('hidden');
     }else{
       sendWrap.classList.add('hidden');
-      sendChk.checked = false;
+      sendCheck.checked = false;
     }
   }
 }
@@ -2919,8 +2912,6 @@ function normalizeNumber57(raw){
 const BRIEF_API_LIST = 'listBriefByEstado';
 const BRIEF_API_GET  = 'getBrief';
 const BRIEF_API_SAVE = 'guardarBrief';
-/* NUEVO: endpoint para buscar teléfonos por asignado */
-const BRIEF_API_GET_PRENSA_CONTACTS = 'getPrensaContactsByNames';
 
 let BRIEF_CURRENT_ESTADO = '';
 let BRIEF_CACHE = [];
@@ -3431,10 +3422,10 @@ function briefResetDetail(){
   const checks = document.querySelectorAll('#requerimients input[type="checkbox"]');
   checks.forEach(ch => ch.checked = false);
 
-  // NUEVO: reset del check enviar mensaje
-  const sendChk = document.getElementById('sendAssignMsg');
-  if(sendChk) sendChk.checked = false;
-}
+  /* NUEVO: reset del checkbox enviar mensaje */
+  const sendCheck = document.getElementById('sendmsg-check');
+  if(sendCheck) sendCheck.checked = false;
+  }
 
 function briefReqChecksFromText(text){
   const src = String(text||'');
@@ -3524,12 +3515,10 @@ function buildBriefGroupMessage(){
   );
 }
 
-/* CAMBIO 1: "DETALLES A GRUPO" ahora SIEMPRE envía al grupo fijo por Builderbot */
+/* CAMBIO #1: DETALLES A GRUPO -> enviar MISMO mensaje al grupo fijo (BuilderBot) */
 document.getElementById('brief-share-group')?.addEventListener('click', async ()=>{
   const msg = buildBriefGroupMessage();
-  const groupId = 'IPI7t3SAtOhHuWpJuxw8Us';
-  sendBuilderbotMessage(groupId, msg);
-  Swal.fire({ icon:'success', title:'ENVIADO AL GRUPO', timer:1400, showConfirmButton:false });
+  sendBuilderbotMessage(BRIEF_GROUP_ID, msg);
 });
 
 function briefFillDetail(d){
@@ -3670,63 +3659,8 @@ function getAsignadoSelectedCsv(){
   return vals.join(', ');
 }
 
-/* NUEVO: obtener lista de nombres asignados (array) desde el multi-select */
-function getAsignadoSelectedArray(){
-  const sel = document.getElementById('asignadoSelect');
-  if(!sel) return [];
-  return Array.from(sel.selectedOptions || [])
-    .map(o => String(o.value || '').trim())
-    .filter(Boolean);
-}
-
-/* NUEVO: consulta en PRENSA los teléfonos y envía 1x1 con espera 2s */
-async function sendAssignedNotificationsIfNeeded(){
-  const chk = document.getElementById('sendAssignMsg');
-  const shouldSend = !!(chk && chk.checked);
-
-  // Solo si el usuario está autorizado
-  if(!shouldSend) return;
-  if(!userCanSendAssignedMsg()) return;
-
-  // Solo si hay asignados seleccionados
-  const names = getAsignadoSelectedArray();
-  if(!names.length) return;
-
-  let contacts = [];
-  try{
-    contacts = await apiGet(BRIEF_API_GET_PRENSA_CONTACTS, { names: names.join(',') });
-  }catch(e){
-    console.warn('No se pudo consultar PRENSA:', e);
-    return;
-  }
-
-  if(!Array.isArray(contacts) || !contacts.length) return;
-
-  const userLabel = String(currentUser?.nombre || '').trim();
-  for(let i=0;i<contacts.length;i++){
-    const it = contacts[i] || {};
-    const nombre = String(it.nombre || '').trim();
-    const telefonoRaw = String(it.telefono || '').trim();
-    const tel = normalizeContratistaNumber(telefonoRaw);
-
-    if(!tel) continue;
-
-    const msg =
-      'Estimado *' + (nombre || '') + '*\n' +
-      'He realizado o editado una asignación en la App\n' +
-      '> Por favor ingresa a revisar\n\n' +
-      'Cordialmente,\n\n' +
-      userLabel;
-
-    sendBuilderbotMessage(tel, msg);
-
-    // espera 2 segundos entre envíos
-    if(i < contacts.length - 1){
-      await sleepMs(2000);
-    }
-  }
-}
-
+/* CAMBIO #2: al guardar, si "Enviar mensaje" está marcado (solo admins) y hay asignados,
+   consultar teléfonos en backend y enviar WhatsApp 1x1 con espera 2s */
 document.getElementById('brief-save')?.addEventListener('click', async ()=>{
   const brief = document.getElementById('brief').value.trim();
   if(!brief){
@@ -3768,6 +3702,10 @@ document.getElementById('brief-save')?.addEventListener('click', async ()=>{
     return;
   }
 
+  const sendCheck = document.getElementById('sendmsg-check');
+  const wantsSend = !!(sendCheck && sendCheck.checked && userIsBriefAdmin());
+  const hasAssigned = !!(body.asignado && String(body.asignado).trim());
+
   try{
     const r = await apiPost(BRIEF_API_SAVE, body);
     if(!r || !r.success){
@@ -3775,8 +3713,37 @@ document.getElementById('brief-save')?.addEventListener('click', async ()=>{
       return;
     }
 
-    // CAMBIO 2: si marcaron "Enviar mensaje", enviar luego de guardar (solo 3 usuarios)
-    await sendAssignedNotificationsIfNeeded();
+    // Solo si check marcado y hay al menos un asignado
+    if(wantsSend && hasAssigned){
+      try{
+        // pide al backend resolver teléfonos por nombres (Col C=nombre, Col D=telefono) en PRENSA
+        const resolved = await apiGet('getTelefonosPrensaByNombres', { nombres: body.asignado });
+
+        const list = Array.isArray(resolved) ? resolved : [];
+        if(list.length){
+          for(const it of list){
+            const nombre = String(it?.nombre || '').trim();
+            const telRaw = String(it?.telefono || '').trim();
+            const tel = normalizeWhatsApp57(telRaw);
+
+            if(tel){
+              const msg =
+                'Estimado *' + nombre + '*\n' +
+                'He realizado o editado una asignación en la App\n' +
+                '> Por favor ingresa a revisar\n\n' +
+                'Cordialmente,\n\n' +
+                (currentUser?.nombre || '');
+
+              sendBuilderbotMessage(tel, msg);
+              await sleepMs(2000);
+            }
+          }
+        }
+      }catch(e){
+        // No romper el flujo principal: el guardado ya ocurrió
+        console.warn('Error enviando mensajes asignados:', e);
+      }
+    }
 
     await briefOpenList(body.estads);
 
