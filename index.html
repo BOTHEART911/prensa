@@ -693,13 +693,33 @@
     }
   }
 
-  .cal-evt-assigned{
-    display:block;
-    font-weight:600;
-    font-size:clamp(.28rem, 0.65vw, .54rem);
-    line-height:1.05;
-    opacity:.9;
-  }
+    .cal-evt-assigned{
+  display:block;
+  font-weight:600;
+  font-size:clamp(.28rem, 0.65vw, .54rem);
+  line-height:1.05;
+  opacity:.9;
+}
+
+/* NUEVO: bloque visual del check "Enviar mensaje" */
+.send-msg-wrap{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:2px solid #ddd;
+  background:rgba(255,255,255,.85);
+  box-shadow:0 4px 10px rgba(0,0,0,.10);
+}
+.send-msg-wrap input[type="checkbox"]{
+  width:18px;
+  height:18px;
+}
+.send-msg-wrap span{
+  font-weight:800;
+  color:#06402B;
+}
   </style>
 </head>
 <body>
@@ -1007,18 +1027,12 @@
         <div id="assign-wrap" class="hidden">
           <label for="asignadoSelect">Asignado (opcional)</label>
           <select id="asignadoSelect" multiple></select>
-        </div>
 
-        <!-- NUEVO: check Enviar mensaje (solo admins) -->
-        <div id="brief-sendmsg-wrap" class="hidden">
-          <label style="margin-top:10px;">Notificación</label>
-          <label class="cal-check-item" style="display:inline-flex; width:auto;">
-            <input type="checkbox" id="brief-sendmsg-check">
+          <!-- NUEVO: check "Enviar mensaje" solo visible para OSCAR/LAURA/IVAN -->
+          <div id="send-assign-msg-wrap" class="send-msg-wrap hidden" style="margin-top:10px;">
+            <input id="sendAssignMsg" type="checkbox">
             <span>Enviar mensaje</span>
-          </label>
-          <p class="muted" style="margin:2px 0 0;">
-            Envía WhatsApp 1x1 a los asignados (solo usuarios autorizados).
-          </p>
+          </div>
         </div>
       </div>
 
@@ -1256,9 +1270,21 @@
 <script>
 const API_BASE = 'https://script.google.com/macros/s/AKfycbzHH5u3VuZU0g3oef7qATHi1blNKsVZQu3PAHt2mfO8lsXTkQOQ6gLfNenkfOl9YHIsbw/exec';
 
-/* ================== BUILDERBOT (NUEVO: para enviar WhatsApp como indexref) ================== */
+/* ================== BUILDERBOT (NUEVO) ================== */
 const BUILDERBOT_ENDPOINT = 'https://app.builderbot.cloud/api/v2/ff37a123-12b0-4fdc-9866-f3e2daf389fb/messages';
 const BUILDERBOT_API_KEY  = 'bb-7f9ef630-5cfc-4ba4-9258-5e7cecbb4f65';
+
+function normalizeContratistaNumber(raw){
+  let num = String(raw || '').replace(/\D/g,'');
+  if(!num) return '';
+  if(num.length === 10 && !num.startsWith('57')){
+    num = '57' + num;
+  }
+  if(!(num.length === 12 && num.startsWith('57'))){
+    return '';
+  }
+  return num;
+}
 
 function sendBuilderbotMessage(destino, mensaje, mediaUrl){
   const numberField = String(destino || '').trim();
@@ -1287,18 +1313,10 @@ function sendBuilderbotMessage(destino, mensaje, mediaUrl){
   }).catch(err => console.warn('Error enviando BuilderBot', err));
 }
 
-function normalizeNumber57(raw){
-  let num = String(raw || '').replace(/\D/g,'');
-  if(!num) return '';
-  if(num.length === 10 && !num.startsWith('57')) num = '57' + num;
-  if(!(num.length === 12 && num.startsWith('57'))) return '';
-  return num;
+function sleepMs(ms){
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
-
-function waitMs(ms){ return new Promise(res=>setTimeout(res, ms)); }
-
-/* 1er cambio: grupo fijo para DETALLES A GRUPO */
-const BRIEF_GROUP_ID = 'IPI7t3SAtOhHuWpJuxw8Us';
+/* ================== FIN BUILDERBOT ================== */
 
 const SOUNDS = {
   question: 'https://res.cloudinary.com/dqqeavica/video/upload/v1759011577/Pay_fail_ls2aif.mp3',
@@ -1494,8 +1512,9 @@ function userCanEditAssignedField(){
   const n = normName(currentUser?.nombre || '');
   return (n === 'OSCAR POLANIA' || n === 'LAURA ORTIZ');
 }
-/* NUEVO: el check lo ven OSCAR, LAURA, IVAN */
-function userCanSeeSendMsgCheck(){
+
+/* NUEVO: los únicos que pueden ver el check "Enviar mensaje" son los 3 admins */
+function userCanSendAssignedMsg(){
   return BRIEF_ADMINS.includes(normName(currentUser?.nombre || ''));
 }
 
@@ -1534,15 +1553,15 @@ function setBriefDetailEditMode(){
     }
   }
 
-  /* NUEVO: mostrar/ocultar check Enviar mensaje */
-  const sendWrap = document.getElementById('brief-sendmsg-wrap');
-  const sendCheck = document.getElementById('brief-sendmsg-check');
-  if(sendWrap && sendCheck){
-    if(userCanSeeSendMsgCheck()){
+  // NUEVO: control de visibilidad del check "Enviar mensaje"
+  const sendWrap = document.getElementById('send-assign-msg-wrap');
+  const sendChk = document.getElementById('sendAssignMsg');
+  if(sendWrap && sendChk){
+    if(userCanSendAssignedMsg() && allowAssigned){
       sendWrap.classList.remove('hidden');
     }else{
       sendWrap.classList.add('hidden');
-      sendCheck.checked = false;
+      sendChk.checked = false;
     }
   }
 }
@@ -2085,9 +2104,6 @@ if ('serviceWorker' in navigator){
   });
 }
 window.addEventListener('load', initPWAVista);
-
-/* ================== CALENDARIO INSTITUCIONAL (SIN CAMBIOS FUNCIONALES) ================== */
-/* ... (todo el bloque de calendario permanece igual al tuyo) ... */
 
 /* ================== CALENDARIO INSTITUCIONAL (SIN CAMBIOS FUNCIONALES) ================== */
 const CAL_API_ACTION_LIST = 'listEventosCalendario';
@@ -2876,6 +2892,13 @@ document.getElementById('evento-guardar')?.addEventListener('click', async ()=>{
   }
 });
 
+function normalizeNumber57(raw){
+  let num = String(raw || '').replace(/\D/g,'');
+  if(!num) return '';
+  if(num.length === 10 && !num.startsWith('57')) num = '57' + num;
+  if(!(num.length === 12 && num.startsWith('57'))) return '';
+  return num;
+}
 (function bindEventoWhatsappButton(){
   const btn = document.getElementById('contacto-wa-btn');
   const contactoInput = document.getElementById('contacto');
@@ -2896,16 +2919,14 @@ document.getElementById('evento-guardar')?.addEventListener('click', async ()=>{
 const BRIEF_API_LIST = 'listBriefByEstado';
 const BRIEF_API_GET  = 'getBrief';
 const BRIEF_API_SAVE = 'guardarBrief';
-/* NUEVO: endpoint para consultar teléfonos desde PRENSA */
-const BRIEF_API_GET_ASSIGNEES_PHONES = 'getPrensaPhonesByNames';
+/* NUEVO: endpoint para buscar teléfonos por asignado */
+const BRIEF_API_GET_PRENSA_CONTACTS = 'getPrensaContactsByNames';
 
 let BRIEF_CURRENT_ESTADO = '';
 let BRIEF_CACHE = [];
 
 let BRIEF_CAL_CURRENT_VIEW = 'month';
 let BRIEF_CAL_CURRENT_DATE = new Date();
-
-/* ... (todo el bloque brief calendario permanece igual, excepto secciones tocadas abajo) ... */
 
 function briefUpdateCalTitle(){
   const titleEl = document.getElementById('brief-cal-title-text');
@@ -2981,11 +3002,296 @@ function briefRenderCalendar(){
   else if(BRIEF_CAL_CURRENT_VIEW === 'year') briefRenderYear(cont, filterVal);
 }
 
-/* (renderMonth/day/week/year siguen igual al tuyo, no los repito aquí porque ya están arriba)
-   PERO como pediste "HTML completo", los dejamos como están en tu versión original.
-   En este archivo ya quedaron cargados arriba (los mismos que enviaste). */
+function briefRenderMonth(cont, filterVal){
+  const header = document.createElement('div');
+  header.className = 'cal-weekdays';
+  CAL_WEEKDAYS_SHORT.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-weekday';
+    el.textContent = d;
+    header.appendChild(el);
+  });
+  cont.appendChild(header);
 
-/* ... */
+  const grid = document.createElement('div');
+  grid.className = 'cal-month-grid';
+
+  const year = BRIEF_CAL_CURRENT_DATE.getFullYear();
+  const month = BRIEF_CAL_CURRENT_DATE.getMonth();
+  const firstDay = new Date(year,month,1);
+  const startWeekDay = firstDay.getDay();
+  const daysInMonth = new Date(year,month+1,0).getDate();
+
+  const prevMonthDays = (startWeekDay + 7 - 0) % 7;
+  const totalCells = prevMonthDays + daysInMonth;
+  const cells = totalCells <= 35 ? 35 : 42;
+
+  const todayDMY = calFormatDMY(new Date());
+
+  for(let i=0; i<cells; i++){
+    const cell = document.createElement('div');
+    cell.className = 'cal-day-cell';
+    const dayOffset = i - prevMonthDays + 1;
+    let cellDate;
+    let inThisMonth = true;
+
+    if(dayOffset < 1){ cellDate = new Date(year, month, dayOffset); inThisMonth = false; }
+    else if(dayOffset > daysInMonth){ cellDate = new Date(year, month, dayOffset); inThisMonth = false; }
+    else { cellDate = new Date(year, month, dayOffset); }
+
+    const iso = calFormatDMY(cellDate);
+    if(!inThisMonth) cell.classList.add('other-month');
+
+    const headerNum = document.createElement('div');
+    headerNum.className = 'cal-day-number';
+    if(iso === todayDMY){
+      headerNum.classList.add('today');
+      headerNum.textContent = cellDate.getDate();
+    }else{
+      headerNum.textContent = cellDate.getDate();
+    }
+    cell.appendChild(headerNum);
+
+    const events = briefEventsOnDay(iso).filter(it => briefMatchesFilter(it, filterVal));
+    events.sort((a,b)=>{
+      const ma = calMinutesFromTimeStr(briefToHHmm(a.horaIs) || '');
+      const mb = calMinutesFromTimeStr(briefToHHmm(b.horaIs) || '');
+      return ma - mb;
+    });
+
+    events.forEach(it=>{
+      const chip = document.createElement('div');
+      chip.className = briefSecretariaColorClass(it.secrets);
+      chip.classList.add('cal-event-chip');
+
+      const title = document.createElement('span');
+      title.className = 'cal-evt-title cal-evt-assigned';
+      title.textContent = String(it.asignado || '').trim();
+
+      const time = document.createElement('span');
+      time.className = 'cal-evt-time';
+      const hi = it.horaIs || '';
+      const hf = it.horaFs || '';
+      time.textContent = (hi ? hi : '') + (hf ? (' - ' + hf) : '');
+
+      chip.appendChild(title);
+      chip.appendChild(time);
+
+      chip.addEventListener('click', ()=> briefOpenDetail(it.brief, BRIEF_CURRENT_ESTADO));
+      cell.appendChild(chip);
+    });
+
+    grid.appendChild(cell);
+  }
+
+  cont.appendChild(grid);
+}
+
+function briefRenderDay(cont, filterVal){
+  const header = document.createElement('div');
+  header.className = 'cal-day-header-row';
+  const d = BRIEF_CAL_CURRENT_DATE;
+  header.textContent = d.toLocaleDateString('es-CO',{ weekday:'long', day:'numeric', month:'long', year:'numeric' }).toUpperCase();
+  cont.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'cal-day-body';
+
+  const iso = calFormatDMY(d);
+  const events = briefEventsOnDay(iso).filter(it => briefMatchesFilter(it, filterVal));
+  events.sort((a,b)=>{
+    const ma = calMinutesFromTimeStr(briefToHHmm(a.horaIs) || '');
+    const mb = calMinutesFromTimeStr(briefToHHmm(b.horaIs) || '');
+    return ma - mb;
+  });
+
+  if(!events.length){
+    const p = document.createElement('p');
+    p.className = 'muted';
+    p.textContent = 'Sin solicitudes para este día.';
+    body.appendChild(p);
+  }else{
+    events.forEach(it=>{
+      const chip = document.createElement('div');
+      chip.className = briefSecretariaColorClass(it.secrets);
+      chip.classList.add('cal-event-chip');
+
+      const title = document.createElement('span');
+      title.className = 'cal-evt-title cal-evt-assigned';
+      title.textContent = String(it.asignado || '').trim();
+
+      const time = document.createElement('span');
+      time.className = 'cal-evt-time';
+      const hi = it.horaIs || '';
+      const hf = it.horaFs || '';
+      time.textContent = (hi ? hi : '') + (hf ? (' - ' + hf) : '');
+
+      chip.appendChild(title);
+      chip.appendChild(time);
+
+      chip.addEventListener('click', ()=> briefOpenDetail(it.brief, BRIEF_CURRENT_ESTADO));
+      body.appendChild(chip);
+    });
+  }
+
+  cont.appendChild(body);
+}
+
+function briefRenderWeek(cont, filterVal){
+  const start = calStartOfWeek(BRIEF_CAL_CURRENT_DATE);
+  const end = calEndOfWeek(BRIEF_CAL_CURRENT_DATE);
+
+  const header = document.createElement('div');
+  header.className = 'cal-week-header-row';
+  header.textContent = 'Semana del ' +
+    start.getDate() + ' ' + CAL_MONTHS_SHORT[start.getMonth()] +
+    ' al ' +
+    end.getDate() + ' ' + CAL_MONTHS_SHORT[end.getMonth()] +
+    ' ' + end.getFullYear();
+  cont.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'cal-week-body';
+
+  for(let i=0;i<7;i++){
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const iso = calFormatDMY(d);
+
+    const row = document.createElement('div');
+    row.style.borderRadius = '10px';
+    row.style.padding = '6px 8px';
+    row.style.background = '#f9fafb';
+    row.style.marginBottom = '6px';
+
+    const head = document.createElement('div');
+    head.style.display = 'flex';
+    head.style.alignItems = 'center';
+    head.style.justifyContent = 'space-between';
+
+    const left = document.createElement('span');
+    left.style.fontWeight = '700';
+    left.style.fontSize = '.8rem';
+    left.textContent = CAL_WEEKDAYS_SHORT[d.getDay()] + ' ' + d.getDate() + ' ' + CAL_MONTHS_SHORT[d.getMonth()];
+
+    head.appendChild(left);
+    row.appendChild(head);
+
+    const events = briefEventsOnDay(iso).filter(it => briefMatchesFilter(it, filterVal));
+    events.sort((a,b)=>{
+      const ma = calMinutesFromTimeStr(briefToHHmm(a.horaIs) || '');
+      const mb = calMinutesFromTimeStr(briefToHHmm(b.horaIs) || '');
+      return ma - mb;
+    });
+
+    if(!events.length){
+      const p = document.createElement('p');
+      p.className = 'muted';
+      p.style.fontSize = '.72rem';
+      p.textContent = 'Sin solicitudes';
+      row.appendChild(p);
+    }else{
+      events.forEach(it=>{
+        const chip = document.createElement('div');
+        chip.className = briefSecretariaColorClass(it.secrets);
+        chip.classList.add('cal-event-chip');
+
+        const title = document.createElement('span');
+        title.className = 'cal-evt-title cal-evt-assigned';
+        title.textContent = String(it.asignado || '').trim();
+
+        const time = document.createElement('span');
+        time.className = 'cal-evt-time';
+        const hi = it.horaIs || '';
+        const hf = it.horaFs || '';
+        time.textContent = (hi ? hi : '') + (hf ? (' - ' + hf) : '');
+
+        chip.appendChild(title);
+        chip.appendChild(time);
+
+        chip.addEventListener('click', ()=> briefOpenDetail(it.brief, BRIEF_CURRENT_ESTADO));
+        row.appendChild(chip);
+      });
+    }
+
+    body.appendChild(row);
+  }
+
+  cont.appendChild(body);
+}
+
+function briefRenderYear(cont, filterVal){
+  const grid = document.createElement('div');
+  grid.className = 'cal-year-grid';
+
+  const year = BRIEF_CAL_CURRENT_DATE.getFullYear();
+  const eventsByMonth = {};
+  BRIEF_CACHE.forEach(it=>{
+    const d = calParseDMY(it.fechaPubs);
+    if(!d || d.getFullYear() !== year) return;
+    const m = d.getMonth();
+    if(!eventsByMonth[m]) eventsByMonth[m] = [];
+    if(briefMatchesFilter(it, filterVal)) eventsByMonth[m].push(it);
+  });
+
+  for(let m=0;m<12;m++){
+    const box = document.createElement('div');
+    box.className = 'cal-year-month';
+
+    const h4 = document.createElement('h4');
+    h4.textContent = new Date(year,m,1).toLocaleDateString('es-CO',{ month:'long' }).toUpperCase();
+    box.appendChild(h4);
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const trh = document.createElement('tr');
+    CAL_WEEKDAYS_SHORT.forEach(d => {
+      const th = document.createElement('th');
+      th.textContent = d.charAt(0);
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    const first = new Date(year,m,1);
+    const startDay = first.getDay();
+    const daysInMonth = new Date(year,m+1,0).getDate();
+
+    let day = 1;
+    let done = false;
+    while(!done){
+      const tr = document.createElement('tr');
+      for(let wd=0; wd<7; wd++){
+        const td = document.createElement('td');
+        if(wd < startDay && day === 1){
+          td.textContent = '';
+        }else if(day > daysInMonth){
+          td.textContent = '';
+          done = true;
+        }else{
+          td.textContent = day;
+          const dmy = calFormatDMY(new Date(year,m,day));
+          const hasEvent = (eventsByMonth[m]||[]).some(it => it.fechaPubs === dmy);
+          if(hasEvent){
+            const dot = document.createElement('span');
+            dot.className = 'cal-year-dot';
+            td.appendChild(dot);
+          }
+          day++;
+        }
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+
+    table.appendChild(tbody);
+    box.appendChild(table);
+    grid.appendChild(box);
+  }
+
+  cont.appendChild(grid);
+}
+
 function briefSyncViewButtons(){
   ['brief-cal-view-day','brief-cal-view-week','brief-cal-view-month','brief-cal-view-year'].forEach(id=>{
     const el = document.getElementById(id);
@@ -3125,9 +3431,9 @@ function briefResetDetail(){
   const checks = document.querySelectorAll('#requerimients input[type="checkbox"]');
   checks.forEach(ch => ch.checked = false);
 
-  /* NUEVO */
-  const sendCheck = document.getElementById('brief-sendmsg-check');
-  if(sendCheck) sendCheck.checked = false;
+  // NUEVO: reset del check enviar mensaje
+  const sendChk = document.getElementById('sendAssignMsg');
+  if(sendChk) sendChk.checked = false;
 }
 
 function briefReqChecksFromText(text){
@@ -3218,12 +3524,12 @@ function buildBriefGroupMessage(){
   );
 }
 
-/* ========= 1er cambio: DETALLES A GRUPO ahora envía por Builderbot al grupo fijo ========= */
+/* CAMBIO 1: "DETALLES A GRUPO" ahora SIEMPRE envía al grupo fijo por Builderbot */
 document.getElementById('brief-share-group')?.addEventListener('click', async ()=>{
   const msg = buildBriefGroupMessage();
-  // Enviar al grupo fijo (no abrir WhatsApp del dispositivo)
-  sendBuilderbotMessage(BRIEF_GROUP_ID, msg);
-  Swal.fire({ icon:'success', title:'Enviado al grupo', timer:1500, showConfirmButton:false });
+  const groupId = 'IPI7t3SAtOhHuWpJuxw8Us';
+  sendBuilderbotMessage(groupId, msg);
+  Swal.fire({ icon:'success', title:'ENVIADO AL GRUPO', timer:1400, showConfirmButton:false });
 });
 
 function briefFillDetail(d){
@@ -3236,7 +3542,7 @@ function briefFillDetail(d){
   document.getElementById('nombreEvents').value = d.nombreEvents || '';
   document.getElementById('fechaEvents').value = d.fechaEvents || '';
 
-  document.getElementById('horaIs').value = briefToHHmm(d.horaIs || '');
+ document.getElementById('horaIs').value = briefToHHmm(d.horaIs || '');
   document.getElementById('horaFs').value = briefToHHmm(d.horaFs || '');
 
   document.getElementById('detalls').value = d.detalls || '';
@@ -3273,30 +3579,31 @@ function briefFillDetail(d){
       o.selected = selected.includes(String(o.value||'').toUpperCase());
     });
 
-    if (window.__choicesAsignado && typeof window.__choicesAsignado.destroy === 'function'){
-      try { window.__choicesAsignado.destroy(); } catch(e) {}
-      window.__choicesAsignado = null;
-    }
+   // Si ya existe una instancia previa de Choices, destruirla antes de crear otra
+if (window.__choicesAsignado && typeof window.__choicesAsignado.destroy === 'function'){
+  try { window.__choicesAsignado.destroy(); } catch(e) {}
+  window.__choicesAsignado = null;
+}
 
-    if(window.Choices){
-      window.__choicesAsignado = new Choices(asignadoSelect, {
-        removeItemButton: true,
-        shouldSort: false,
-        placeholder: true,
-        placeholderValue: 'Selecciona uno o varios'
-      });
-    }
+if(window.Choices){
+  window.__choicesAsignado = new Choices(asignadoSelect, {
+    removeItemButton: true,
+    shouldSort: false,
+    placeholder: true,
+    placeholderValue: 'Selecciona uno o varios'
+  });
+}
   }
 
-  if(window.__choicesAsignado){
-    const selectedVals = String(d.asignado || '')
-      .split(',')
-      .map(s=>s.trim())
-      .filter(Boolean)
-      .map(s=>s.toUpperCase());
+ if(window.__choicesAsignado){
+     const selectedVals = String(d.asignado || '')
+       .split(',')
+       .map(s=>s.trim())
+       .filter(Boolean)
+       .map(s=>s.toUpperCase());
 
-    window.__choicesAsignado.setChoiceByValue(selectedVals);
-  }
+     window.__choicesAsignado.setChoiceByValue(selectedVals);
+   }
 
   if(asignadoWrap){
     if(userCanEditAssignedField()){
@@ -3363,58 +3670,59 @@ function getAsignadoSelectedCsv(){
   return vals.join(', ');
 }
 
-function getSelectedAsignadosArrayUpper(){
+/* NUEVO: obtener lista de nombres asignados (array) desde el multi-select */
+function getAsignadoSelectedArray(){
   const sel = document.getElementById('asignadoSelect');
   if(!sel) return [];
   return Array.from(sel.selectedOptions || [])
-    .map(o=>String(o.value||'').trim())
-    .filter(Boolean)
-    .map(s=>s.toUpperCase());
+    .map(o => String(o.value || '').trim())
+    .filter(Boolean);
 }
 
-/* NUEVO: enviar WhatsApp 1x1 a asignados (2s entre cada uno) */
-async function sendBriefAsignadoMessagesIfNeeded(){
-  const sendCheck = document.getElementById('brief-sendmsg-check');
-  if(!sendCheck || !sendCheck.checked) return;
+/* NUEVO: consulta en PRENSA los teléfonos y envía 1x1 con espera 2s */
+async function sendAssignedNotificationsIfNeeded(){
+  const chk = document.getElementById('sendAssignMsg');
+  const shouldSend = !!(chk && chk.checked);
 
-  // Solo estos 3 usuarios pueden activar mensajes
-  if(!userCanSeeSendMsgCheck()) return;
+  // Solo si el usuario está autorizado
+  if(!shouldSend) return;
+  if(!userCanSendAssignedMsg()) return;
 
-  const asignados = getSelectedAsignadosArrayUpper();
-  if(!asignados.length) return;
+  // Solo si hay asignados seleccionados
+  const names = getAsignadoSelectedArray();
+  if(!names.length) return;
 
-  // Consulta teléfonos en PRENSA por nombre
-  let phones = [];
+  let contacts = [];
   try{
-    const res = await apiPost(BRIEF_API_GET_ASSIGNEES_PHONES, { names: asignados });
-    phones = Array.isArray(res) ? res : [];
+    contacts = await apiGet(BRIEF_API_GET_PRENSA_CONTACTS, { names: names.join(',') });
   }catch(e){
-    Swal.fire({ icon:'error', title:'Error consultando teléfonos', text:String(e.message||e) });
+    console.warn('No se pudo consultar PRENSA:', e);
     return;
   }
 
-  // phones: [{nombre:"...", telefono:"310..."}, ...]
-  const usuario = String(currentUser?.nombre || '').trim();
+  if(!Array.isArray(contacts) || !contacts.length) return;
 
-  for(let i=0;i<phones.length;i++){
-    const item = phones[i] || {};
-    const nombre = String(item.nombre || '').trim();
-    const telRaw = String(item.telefono || '').trim();
-    const tel = normalizeNumber57(telRaw);
-    if(!nombre || !tel) continue;
+  const userLabel = String(currentUser?.nombre || '').trim();
+  for(let i=0;i<contacts.length;i++){
+    const it = contacts[i] || {};
+    const nombre = String(it.nombre || '').trim();
+    const telefonoRaw = String(it.telefono || '').trim();
+    const tel = normalizeContratistaNumber(telefonoRaw);
 
-    const mensaje =
-      'Estimado *' + nombre + '*\n' +
+    if(!tel) continue;
+
+    const msg =
+      'Estimado *' + (nombre || '') + '*\n' +
       'He realizado o editado una asignación en la App\n' +
       '> Por favor ingresa a revisar\n\n' +
       'Cordialmente,\n\n' +
-      usuario;
+      userLabel;
 
-    sendBuilderbotMessage(tel, mensaje);
+    sendBuilderbotMessage(tel, msg);
 
-    // Espera 2 segundos entre cada envío
-    if(i < phones.length - 1){
-      await waitMs(2000);
+    // espera 2 segundos entre envíos
+    if(i < contacts.length - 1){
+      await sleepMs(2000);
     }
   }
 }
@@ -3437,7 +3745,7 @@ document.getElementById('brief-save')?.addEventListener('click', async ()=>{
     body.fechaIngreso = document.getElementById('fechaIngreso').value.trim();
     body.nombreEvents = document.getElementById('nombreEvents').value.trim();
     body.fechaEvents = document.getElementById('fechaEvents').value.trim();
-    body.horaIs = toAmPmFromHHmm(document.getElementById('horaIs').value.trim());
+     body.horaIs = toAmPmFromHHmm(document.getElementById('horaIs').value.trim());
     body.horaFs = toAmPmFromHHmm(document.getElementById('horaFs').value.trim());
     body.detalls = document.getElementById('detalls').value.trim();
     body.requerimients = briefReqTextFromChecks();
@@ -3467,8 +3775,8 @@ document.getElementById('brief-save')?.addEventListener('click', async ()=>{
       return;
     }
 
-    // NUEVO: solo si check marcado y hay asignados
-    await sendBriefAsignadoMessagesIfNeeded();
+    // CAMBIO 2: si marcaron "Enviar mensaje", enviar luego de guardar (solo 3 usuarios)
+    await sendAssignedNotificationsIfNeeded();
 
     await briefOpenList(body.estads);
 
