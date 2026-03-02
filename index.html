@@ -1005,10 +1005,17 @@
         </select>
 
         <div id="assign-wrap" class="hidden">
-          <label for="asignadoSelect">Asignado (opcional)</label>
-          <select id="asignadoSelect" multiple></select>
-        </div>
-      </div>
+  <label for="asignadoSelect">Asignado (opcional)</label>
+  <select id="asignadoSelect" multiple></select>
+
+  <!-- ✅ CAMBIO 2: check Enviar mensaje (solo OSCAR/LAURA/IVAN) -->
+  <div id="send-assign-wrap" class="hidden" style="margin-top:10px;">
+    <label style="display:flex;align-items:center;gap:10px;font-weight:900;color:#06402B;">
+      <input type="checkbox" id="send-assign-msg" style="width:18px;height:18px;">
+      <span>Enviar mensaje</span>
+    </label>
+  </div>
+</div>
 
       <div class="btn-row spaced" style="margin-top:14px;">
         <button id="brief-share-group" class="btn-primary">DETALLES A GRUPO</button>
@@ -1439,6 +1446,12 @@ function userCanEditAssignedField(){
   return (n === 'OSCAR POLANIA' || n === 'LAURA ORTIZ');
 }
 
+  // ✅ CAMBIO 2: solo estos 3 pueden ver/usar "Enviar mensaje"
+function userCanSendAssignMessages(){
+  const n = normName(currentUser?.nombre || '');
+  return (n === 'OSCAR POLANIA' || n === 'LAURA ORTIZ' || n === 'IVAN OSPINA');
+}
+
 function setBriefDetailEditMode(){
   const canFullEdit = userIsBriefAdmin();
   const allowAssigned = userCanEditAssignedField();
@@ -1473,6 +1486,18 @@ function setBriefDetailEditMode(){
       wrap.classList.add('hidden');
     }
   }
+
+  // ✅ CAMBIO 2: mostrar/ocultar check "Enviar mensaje"
+const sendWrap = document.getElementById('send-assign-wrap');
+const sendChk  = document.getElementById('send-assign-msg');
+if(sendWrap && sendChk){
+  if(userCanSendAssignMessages()){
+    sendWrap.classList.remove('hidden');
+  }else{
+    sendWrap.classList.add('hidden');
+    sendChk.checked = false;
+  }
+}
 }
 
 /* ================== COMUNICADOS ================== */
@@ -2828,6 +2853,9 @@ function normalizeNumber57(raw){
 const BRIEF_API_LIST = 'listBriefByEstado';
 const BRIEF_API_GET  = 'getBrief';
 const BRIEF_API_SAVE = 'guardarBrief';
+// ✅ CAMBIO 1: envío a grupo fijo (BuilderBot vía backend)
+const BRIEF_API_SEND_GROUP = 'sendBriefToGroup';
+const BRIEF_GROUP_ID = 'IPI7t3SAtOhHuWpJuxw8Us'; // Grupo de Prensa
 
 let BRIEF_CURRENT_ESTADO = '';
 let BRIEF_CACHE = [];
@@ -3428,13 +3456,19 @@ function buildBriefGroupMessage(){
 }
 
 document.getElementById('brief-share-group')?.addEventListener('click', async ()=>{
+  playSoundOnce(SOUNDS.login);
+
   const msg = buildBriefGroupMessage();
 
-  const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent || '');
-  const enc = encodeURIComponent(msg);
-  const url = esMovil ? 'whatsapp://send?text=' + enc : 'https://api.whatsapp.com/send?text=' + enc;
-
-  window.open(url, '_blank');
+  try{
+    await apiPost(BRIEF_API_SEND_GROUP, {
+      groupId: BRIEF_GROUP_ID,
+      message: msg
+    });
+    Swal.fire({ icon:'success', title:'Enviado al grupo', timer:1500, showConfirmButton:false });
+  }catch(e){
+    Swal.fire({ icon:'error', title:'Error', text:String(e.message||e) });
+  }
 });
 
 function briefFillDetail(d){
@@ -3615,6 +3649,12 @@ document.getElementById('brief-save')?.addEventListener('click', async ()=>{
     Swal.fire({icon:'warning', title:'Estado requerido'});
     return;
   }
+
+  // ✅ CAMBIO 2: bandera enviar mensaje + usuario que ejecuta
+const sendChk = document.getElementById('send-assign-msg');
+const wantsSend = !!(sendChk && sendChk.checked && userCanSendAssignMessages());
+body.enviarMensaje = wantsSend ? 'true' : 'false';
+body.userNombre = String(currentUser?.nombre || '').trim();
 
   try{
     const r = await apiPost(BRIEF_API_SAVE, body);
