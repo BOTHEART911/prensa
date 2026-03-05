@@ -3735,11 +3735,11 @@ document.getElementById('brief-save')?.addEventListener('click', async ()=>{
 
             if(tel){
               const msg =
-                'Estimado *' + nombre + '*\n' +
+                'Estimado(a) *' + nombre + '*\n' +
                 'He realizado o editado una asignación en la App\n' +
                 '> Por favor ingresa a revisar\n\n' +
                 'Cordialmente,\n\n' +
-                (currentUser?.nombre || '');
+                '*' + (currentUser?.nombre || '') + '*';
 
               sendBuilderbotMessage(tel, msg);
               await sleepMs(2000);
