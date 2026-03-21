@@ -780,6 +780,7 @@
         <button id="go-brief-proceso" class="btn-primary">SOLICITUDES EN PROCESO</button>
         <button id="go-brief-realizada" class="btn-primary">SOLICITUDES REALIZADAS</button>
 
+        <button id="go-mis-informes" class="btn-primary">MIS INFORMES</button>
         <button id="go-comunicados" class="btn-primary">COMUNICADOS</button>
         <button id="go-calendario" class="btn-primary">CALENDARIO INSTITUCIONAL</button>
         <button id="go-directorio" class="btn-primary">DIRECTORIO INSTITUCIONAL</button>
@@ -1558,6 +1559,32 @@ function setBriefDetailEditMode(){
     }
   }
 }
+
+  /* ================== MIS INFORMES ================== */
+document.getElementById('go-mis-informes')?.addEventListener('click', async ()=>{
+  // mismo sonido que usas para entrar a módulos
+  playSoundOnce(SOUNDS.login);
+
+  if(!currentUser?.cedula){
+    Swal.fire({icon:'warning', title:'Sesión inválida'});
+    return;
+  }
+
+  try{
+    const r = await apiGet('getMisInformesUrl', { cedula: currentUser.cedula });
+
+    const url = String(r?.url || '').trim();
+    if(!url){
+      Swal.fire({ icon:'info', title:'Sin enlace', text:'No tienes enlace registrado en MIS INFORMES.' });
+      return;
+    }
+
+    // Abre en nueva pestaña
+    window.open(url, '_blank');
+  }catch(e){
+    Swal.fire({icon:'error', title:'Error', text:String(e.message||e)});
+  }
+});
 
 /* ================== COMUNICADOS ================== */
 document.getElementById('go-comunicados').addEventListener('click', ()=>{
