@@ -1754,6 +1754,16 @@ function setBriefDetailEditMode(){
       sendCheck.checked = false;
     }
   }
+
+  /* Botón DETALLES A GRUPO: visible solo para super usuarios (BRIEF_ADMINS) */
+  const btnShareGroup = document.getElementById('brief-share-group');
+  if(btnShareGroup){
+    if(userIsBriefAdmin()){
+      btnShareGroup.classList.remove('hidden');
+    }else{
+      btnShareGroup.classList.add('hidden');
+    }
+  }
 }
 
   /* ================== MIS INFORMES ================== */
@@ -3855,7 +3865,11 @@ async function briefOpenDetail(briefId, returnEstado){
 
 document.getElementById('brief-detail-back')?.addEventListener('click', ()=>{
   playSoundOnce(SOUNDS.back);
-  showView('view-inicio');
+  if(BRIEF_CURRENT_ESTADO){
+    briefOpenList(BRIEF_CURRENT_ESTADO);
+  }else{
+    showView('view-inicio');
+  }
 });
 
 (function bindBriefWhatsapp(){
@@ -3975,7 +3989,8 @@ document.getElementById('brief-save')?.addEventListener('click', async ()=>{
       }
     }
 
-    await briefOpenList(body.estads);
+      // Return to the list the user came from, not necessarily the new estado
+    await briefOpenList(BRIEF_CURRENT_ESTADO);
 
     Swal.fire({icon:'success', title:'Guardado', timer:1400, showConfirmButton:false});
   }catch(e){
