@@ -3971,12 +3971,25 @@ document.getElementById('brief-save')?.addEventListener('click', async ()=>{
             const tel = normalizeWhatsApp57(telRaw);
 
             if(tel){
-              const msg =
-                'Estimado(a) *' + nombre + '*\n' +
-                'He realizado o editado una asignación en la App\n' +
-                '> Por favor ingresa a revisar\n\n' +
-                'Cordialmente,\n\n' +
-                '*' + (currentUser?.nombre || '') + '*';
+             const fechaPubRaw = String(body.fechaPubs || '').trim();
+const mesesNombresMsg = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+function formatFechaPubMsg(dmy){
+  if(!dmy) return '';
+  const p = dmy.split('/');
+  if(p.length !== 3) return dmy;
+  const d = parseInt(p[0],10);
+  const m = parseInt(p[1],10);
+  if(!d || !m || m < 1 || m > 12) return dmy;
+  return d + ' de ' + mesesNombresMsg[m-1];
+}
+const fechaPub = formatFechaPubMsg(fechaPubRaw);
+
+const msg =
+  'Hola *' + nombre + '*\n' +
+  'He realizado o editado una asignación en la App\n' +
+  '> Encuéntrala el día *' + fechaPub + '*\n\n' +
+  'Cordialmente,\n\n' +
+  '*' + (currentUser?.nombre || '') + '*';
 
               sendBuilderbotMessage(tel, msg);
               await sleepMs(2000);
