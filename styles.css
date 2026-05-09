@@ -425,12 +425,12 @@ button:active { transform: translateY(0); }
 
 /* Cabecera días de la semana */
 .cal-weekdays {
-  display: grid; grid-template-columns: repeat(7,1fr);
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
   background: rgba(var(--primary-rgb), .05);
   border-bottom: 1px solid rgba(var(--primary-rgb), .07);
 }
 .cal-month-grid {
-  display: grid; grid-template-columns: repeat(7,1fr);
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
   border-top: 1px solid rgba(var(--primary-rgb), .05);
 }
 .cal-weekday, .cal-day-header {
@@ -452,6 +452,8 @@ button:active { transform: translateY(0); }
   background: transparent;
   transition: background .15s ease;
   cursor: pointer;
+  min-width: 0;        /* permite que la columna se contraiga */
+  overflow: hidden;    /* ningún chip se sale de su celda */
 }
 .cal-day-cell:hover { background: rgba(var(--primary-rgb), .04); }
 .cal-day-cell.other-month { background: rgba(0,0,0,.018); }
@@ -477,7 +479,7 @@ button:active { transform: translateY(0); }
   margin-top: 2px;
   padding: 2px 4px;
   border-radius: 6px;
-  font-size: clamp(.32rem, 0.7vw, .58rem);
+  font-size: clamp(.32rem, 1.6vw, .58rem);
   line-height: 1.15;
   cursor: pointer;
   color: #111;
@@ -485,6 +487,10 @@ button:active { transform: translateY(0); }
   background: rgba(255,255,255,.85);
   border: 1px solid rgba(var(--primary-rgb), .12);
   transition: transform .1s ease, box-shadow .1s ease;
+  max-width: 100%;            /* nunca excede la celda */
+  overflow: hidden;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .cal-event-chip:hover {
   transform: scale(1.025);
@@ -492,11 +498,16 @@ button:active { transform: translateY(0); }
 }
 .cal-event-chip .cal-evt-title {
   font-weight: 800; display: block;
-  font-size: clamp(.34rem, 0.8vw, .66rem);
+  font-size: clamp(.34rem, 1.8vw, .66rem);
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .cal-event-chip .cal-evt-time {
   font-weight: 600;
-  font-size: clamp(.30rem, 0.65vw, .56rem);
+  display: block;
+  font-size: clamp(.30rem, 1.5vw, .56rem);
+  max-width: 100%;
 }
 .cal-evt-assigned {
   display: block; font-weight: 600;
@@ -901,4 +912,15 @@ body .swal2-backdrop-show {
 .choices__button {
   border-left-color: rgba(var(--primary-rgb), .25) !important;
   filter: brightness(0) saturate(100%) !important;
+}
+
+
+/* Móviles estrechos: aprovechar cada píxel del calendario */
+@media (max-width: 480px) {
+  #view-brief .card,
+  #view-calendario .card { padding: 14px 10px 16px; }
+
+  .cal-day-cell { padding: 3px 2px; min-height: 72px; }
+  .cal-day-number { font-size: .72rem; }
+  .cal-weekday { padding: 7px 2px; font-size: .68rem; }
 }
